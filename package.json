@@ -1,6 +1,7 @@
 {
   "name": "tooling.report",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "rollup -c && node lib/move-output.js",
     "debug": "node --inspect-brk node_modules/.bin/rollup -c",
@@ -12,6 +13,7 @@
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^8.1.0",
     "@types/prismjs": "^1.16.1",
+    "astro": "^4.16.8",
     "async-disk-cache": "^2.1.0",
     "cssnano": "^4.1.10",
     "del": "^5.1.0",
@@ -21,6 +23,7 @@
     "husky": "^4.2.5",
     "lint-staged": "^10.2.11",
     "lodash.camelcase": "^4.3.0",
+    "lucide": "^0.454.0",
     "marked": "^1.1.0",
     "node-fetch": "^2.6.0",
     "pnpm": "^4.14.4",
@@ -31,11 +34,12 @@
     "postcss-url": "^8.0.0",
     "preact": "^10.4.5",
     "preact-render-to-string": "^5.1.9",
-    "prettier": "^1.19.1",
+    "prettier": "^3.3.3",
     "prismjs": "^1.20.0",
     "rollup": "^2.21.0",
     "rollup-plugin-terser": "^6.1.0",
-    "typescript": "^3.9.6"
+    "typescript": "^3.9.6",
+    "vite": "^5.4.10"
   },
   "husky": {
     "hooks": {
@@ -49,5 +53,8 @@
   },
   "engines": {
     "node": ">=12"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^3.1.9"
   }
 }

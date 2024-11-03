@@ -1,0 +1,66 @@
+---
+import { getEntry } from 'astro:content';
+import { undefined } from 'astro:schema';
+
+import SpecSection from '../components/SpecSection.astro';
+import CompatSection from '../components/CompatSection.astro';
+
+import '../styles/feature.css';
+
+const {
+  frontmatter: { title, docs, featureFile, featureId },
+} = Astro.props;
+
+const compatData = featureFile
+  ? await getEntry('bundler-compat-data', featureFile)
+  : undefined;
+const compatPath = featureId ? featureId.split('.') : featureFile?.split('/');
+
+if (featureFile && !compatData) {
+  throw new Error(
+    `Invalid featureFile '${featureFile}' in '${Astro.props.file}'`,
+  );
+}
+
+const feature = compatData
+  ? compatPath.reduce((obj: any, prop: string) => obj[prop], compatData.data)
+  : undefined;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <title>{title}</title>
+  </head>
+  <body>
+    <div class="main-wrapper">
+      <main>
+        <article>
+          <header>
+            <h1>{title}</h1>
+          </header>
+          <slot />
+          {feature && <SpecSection feature={feature} />}
+          {feature && <CompatSection feature={feature} />}
+        </article>
+      </main>
+    </div>
+    <footer>
+      <p>
+        Based on <a href="https://tooling.report">tooling.report</a>, created by
+        web.dev and GoogleChromeLabs. Core team: Adam, Jake, Jason, Mariko,
+        Surma & Una).
+      </p>
+      <p>
+        Feature overview page design based on <a href="https://mdn.dev">MDN</a>.
+      </p>
+    </footer>
+  </body>
+</html>

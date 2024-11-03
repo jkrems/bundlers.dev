@@ -1,0 +1,57 @@
+---
+layout: ../../../layouts/Feature.astro
+title: "import.meta"
+
+featureFile: "javascript/operators/import_meta"
+
+docs:
+  MDN: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import.meta
+  Vite: https://vite.dev/guide/env-and-mode
+  Webpack: https://webpack.js.org/api/module-variables/#importmeta
+---
+import ExperimentalInline from '../../../components/ExperimentalInline.astro';
+
+## Syntax
+
+### Value
+
+There's two distinct `import.meta` objects: The object that is referenced in source files
+and the object that exists when running the application. Since the value is specific to
+individual files, references to `import.meta` are typically replaced during bundling.
+
+For authoring code, bundlers may provide the following properties:
+
+<dl>
+  <dt><code>url</code></dt>
+  <dd>A reference to the current module that can be used to reference other resources. Often used in combination with the <code>URL</code> constructor.</dd>
+
+  <dt><code>resolve</code></dt>
+  <dd>Resolves a given specifier in the context of the current file. Very similar to <code>url</code> but more concise for common use cases.</dd>
+
+  <dt><code>hot</code> <ExperimentalInline /></dt>
+  <dd>During development, this may be an object that provides APIs for handling hot replacement. The details of the API are bundler specific.</dd>
+
+  <dt><code>env</code> <ExperimentalInline /></dt>
+  <dd>Object that contains custom environment settings, e.g. those read from <code>.env</code> files.</dd>
+
+  <dt><code>env.DEV</code> <ExperimentalInline /></dt>
+  <dd>A boolean that specifies if development-time debug assertions should be enabled, e.g. because the code is running in an interactive development environment.</dd>
+
+  <dt><code>env.PROD</code> <ExperimentalInline /></dt>
+  <dd>A boolean that specifies if development-time debug assertions should be disabled, e.g. because the code is being built for a minified & optimized production environment. Should be equal to `!env.DEV` if both exist.</dd>
+
+  <dt><code>env.MODE</code> <ExperimentalInline /></dt>
+  <dd>A string description for a "bundling mode". May include any user-defined string.</dd>
+
+  <dt><code>env.SSR</code> <ExperimentalInline /></dt>
+  <dd>A boolean that is true if the code is running as part of SSR (server-side rendering).</dd>
+
+  <dt><code>webpack</code> <ExperimentalInline /></dt>
+  <dd>The version of webpack used to bundle the code.</dd>
+
+  <dt><code>webpackHot</code> <ExperimentalInline /></dt>
+  <dd>Webpack's hot module replacement API that is available during development.</dd>
+
+  <dt><code>webpackContext</code> <ExperimentalInline /></dt>
+  <dd>Webpack-specific metadata about the current file.</dd>
+</dl>

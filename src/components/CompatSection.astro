@@ -1,0 +1,231 @@
+---
+import ExperimentalInline from './ExperimentalInline.astro';
+
+const PLATFORMS = [
+  {
+    id: 'bundler',
+    name: 'Bundlers',
+    children: [
+      {
+        id: 'esbuild',
+        name: 'esbuild',
+      },
+      {
+        id: 'rsbuild',
+        name: 'Rsbuild',
+      },
+      {
+        id: 'rspack',
+        name: 'Rspack',
+      },
+      {
+        id: 'vite',
+        name: 'Vite',
+      },
+      {
+        id: 'webpack',
+        name: 'Webpack',
+      },
+    ],
+  },
+  {
+    id: 'runtime',
+    name: 'Runtimes',
+    children: [
+      {
+        id: 'bun',
+        name: 'Bun',
+      },
+      {
+        id: 'deno',
+        name: 'Deno',
+      },
+      {
+        id: 'nodejs',
+        name: 'Node.js',
+      },
+    ],
+  },
+];
+
+interface CompatEntry {
+  description: string;
+  support: {
+    [name: string]: {
+      version_added: string | boolean;
+    };
+  };
+  status: {
+    experimental: boolean;
+    standard_track: boolean;
+    deprecated: boolean;
+  };
+}
+
+function collectCompat(feature: object): CompatEntry[] {
+  const result: CompatEntry[] = [];
+
+  for (const [key, value] of Object.entries(feature)) {
+    if (key === '__compat') {
+      result.push(value);
+    } else {
+      result.push(...collectCompat(value as object));
+    }
+  }
+
+  return result;
+}
+
+const compats = collectCompat(Astro.props.feature);
+---
+
+<style>
+  table {
+    --color-table-border: #cdcdcd;
+    --text-primary-red: #d30038;
+    --text-primary-green: #007936;
+
+    border-collapse: collapse;
+    border: 1px solid var(--color-table-border);
+    width: 100%;
+  }
+
+  th {
+    text-align: center;
+    vertical-align: bottom;
+    padding: 0.25rem;
+    border: 1px solid var(--color-table-border);
+
+    font-weight: 500;
+    font-size: var(--type-smaller-font-size);
+  }
+
+  tbody > tr > th {
+    vertical-align: middle;
+  }
+
+  td {
+    text-align: center;
+    border: 1px solid var(--color-table-border);
+    padding: 0;
+  }
+
+  td > button {
+    font-size: inherit;
+    padding: 0.5rem 0.25rem;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    border: none;
+    background-color: transparent;
+    gap: 0.5rem;
+    box-sizing: border-box;
+    width: 100%;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #eee;
+    }
+  }
+
+  .platform-name-label {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    left: calc(50% - 0.5rem);
+    line-height: 1;
+    padding-inline: 0.5rem;
+    position: relative;
+  }
+
+  .feature-desc {
+    text-align: left;
+  }
+
+  .support-supported {
+    color: var(--text-primary-green);
+  }
+
+  .support-supported > .icon::after {
+    mask-image: var(--icon-check);
+  }
+
+  .support-unsupported {
+    color: var(--text-primary-red);
+  }
+
+  .support-unsupported > .icon::after {
+    mask-image: var(--icon-x);
+    background-color: var(--text-primary-red);
+  }
+
+  .status-experimental::after {
+    mask-image: var(--icon-experimental);
+  }
+</style>
+<h2>Bundler compatibility</h2>
+<table>
+  <thead>
+    <tr>
+      <td rowspan="2"></td>
+      {PLATFORMS.map((p) => <th colspan={p.children.length}>{p.name}</th>)}
+    </tr>
+    <tr>
+      {
+        PLATFORMS.flatMap((p) =>
+          p.children.map((pc) => (
+            <th>
+              <div class="platform-name-label">{pc.name}</div>
+            </th>
+          )),
+        )
+      }
+    </tr>
+  </thead>
+  <tbody>
+    {
+      compats.map((compat) => {
+        console.log(compat);
+        return (
+          <tr>
+            <th class="feature-desc">
+              <span set:html={compat.description} />
+              {compat.status.experimental && <ExperimentalInline />}
+            </th>
+            {PLATFORMS.flatMap((p) =>
+              p.children.map((pc) => {
+                let support = compat.support[pc.id] || {
+                  version_added: null,
+                };
+                if (Array.isArray(support)) {
+                  support = support[0];
+                }
+                return (
+                  <td>
+                    <button
+                      class:list={[
+                        support.version_added
+                          ? 'support-supported'
+                          : 'support-unsupported',
+                      ]}
+                    >
+                      {support.version_added ? (
+                        <abbr class="icon" />
+                      ) : (
+                        <abbr class="icon" />
+                      )}
+                      {support.version_added ? (
+                        <div class="version-added">Yes</div>
+                      ) : (
+                        <div class="version-added">No</div>
+                      )}
+                    </button>
+                  </td>
+                );
+              }),
+            )}
+          </tr>
+        );
+      })
+    }
+  </tbody>
+</table>

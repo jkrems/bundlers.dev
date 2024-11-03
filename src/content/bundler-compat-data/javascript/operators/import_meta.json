@@ -1,0 +1,156 @@
+{
+  "javascript": {
+    "operators": {
+      "import_meta": {
+        "__compat": {
+          "description": "<code>import.meta</code>",
+          "mdn_url": "https://developer.mozilla.org/docs/Web/JavaScript/Reference/Operators/import.meta",
+          "spec_url": [
+            "https://vite.dev/guide/env-and-mode",
+            "https://webpack.js.org/api/module-variables/#importmeta"
+          ],
+          "support": {
+            "vite": {
+              "version_added": true
+            },
+            "webpack": {
+              "version_added": true
+            }
+          },
+          "status": {
+            "experimental": false,
+            "standard_track": true,
+            "deprecated": false
+          }
+        },
+        "url": {
+          "__compat": {
+            "description": "<code>import.meta.url</code>",
+            "support": {
+              "vite": {
+                "version_added": true
+              },
+              "webpack": {
+                "version_added": true
+              }
+            },
+            "status": {
+              "experimental": false,
+              "standard_track": true,
+              "deprecated": false
+            }
+          },
+          "web_worker": {
+            "__compat": {
+              "description": "<code>Worker</code> from <code>import.meta.url</code>",
+              "mdn_url": "https://developer.mozilla.org/en-US/docs/Web/API/Worker/Worker#url",
+              "support": {
+                "vite": {
+                  "version_added": true
+                },
+                "webpack": {
+                  "version_added": true
+                }
+              },
+              "status": {
+                "experimental": false,
+                "standard_track": true,
+                "deprecated": false
+              }
+            }
+          }
+        },
+        "env": {
+          "__compat": {
+            "description": "<code>import&#8288;.meta.env</code>",
+            "support": {
+              "vite": {
+                "version_added": true
+              },
+              "webpack": {
+                "version_added": false
+              }
+            },
+            "status": {
+              "experimental": true,
+              "standard_track": false,
+              "deprecated": false
+            }
+          }
+        },
+        "hot": {
+          "__compat": {
+            "description": "<code>import&#8288;.meta.hot</code>",
+            "support": {
+              "vite": {
+                "version_added": true
+              },
+              "webpack": {
+                "version_added": false
+              }
+            },
+            "status": {
+              "experimental": true,
+              "standard_track": false,
+              "deprecated": false
+            }
+          }
+        },
+        "webpack": {
+          "__compat": {
+            "description": "<code>import&#8288;.meta.webpack</code>",
+            "support": {
+              "vite": {
+                "version_added": false
+              },
+              "webpack": {
+                "version_added": true
+              }
+            },
+            "status": {
+              "experimental": true,
+              "standard_track": false,
+              "deprecated": false
+            }
+          }
+        },
+        "webpack_context": {
+          "__compat": {
+            "description": "<code>import&#8288;.meta.webpackContext</code>",
+            "support": {
+              "vite": {
+                "version_added": false
+              },
+              "webpack": {
+                "version_added": true
+              }
+            },
+            "status": {
+              "experimental": true,
+              "standard_track": false,
+              "deprecated": false
+            }
+          }
+        },
+        "webpack_hot": {
+          "__compat": {
+            "description": "<code>import&#8288;.meta.webpackHot</code>",
+            "support": {
+              "vite": {
+                "version_added": false
+              },
+              "webpack": {
+                "version_added": true
+              }
+            },
+            "status": {
+              "experimental": true,
+              "standard_track": false,
+              "deprecated": false
+            }
+          }
+        }
+      }
+    }
+  }
+}

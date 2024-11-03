@@ -1,0 +1,81 @@
+---
+const compat = Astro.props.feature.__compat;
+
+const specUrls = Array.isArray(compat.spec_url)
+  ? compat.spec_url
+  : typeof compat.spec_url === 'string'
+    ? [compat.spec_url]
+    : [];
+
+function getSourceId(href: string) {
+  return new URL(href).hostname;
+}
+---
+
+<style>
+  table {
+    border: 1px solid var(--border-primary);
+    border-collapse: collapse;
+    width: 100%;
+
+    --font-body-strong-weight: 600;
+
+    --background-primary: #fff;
+    --background-secondary: #f9f9fb;
+  }
+
+  table th {
+    background: var(--background-primary);
+    font-weight: var(--font-body-strong-weight);
+    line-height: 1.5;
+    text-align: left;
+  }
+
+  table td,
+  table th {
+    border: 1px solid var(--border-primary);
+    padding: 0.5rem 0.75rem;
+    vertical-align: middle;
+  }
+
+  table tr:nth-child(odd) td,
+  table tr:nth-child(odd) th,
+  table tr:nth-child(odd) td,
+  table tr:nth-child(odd) th {
+    background-color: var(--background-secondary);
+  }
+</style>
+<h2>Specifications</h2>
+<table>
+  <thead><tr><td>Specification</td></tr></thead>
+  <tbody>
+    {
+      compat.mdn_url && (
+        <tr>
+          <td>
+            <a href={compat.mdn_url}>
+              MDN
+              <>
+                <br />
+                <small>{compat.mdn_url}</small>
+              </>
+            </a>
+          </td>
+        </tr>
+      )
+    }
+    {
+      specUrls.map((href: string) => (
+        <tr>
+          <td>
+            <a href={href}>
+              {getSourceId(href)}
+              <br />
+              <small>{href}</small>
+            </a>
+          </td>
+        </tr>
+      ))
+    }
+  </tbody>
+</table>

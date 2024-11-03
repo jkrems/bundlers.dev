@@ -1,0 +1,134 @@
+:root {
+  --font-fallback: BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  --font-body: 'Inter', var(--font-fallback);
+  --font-heading: 'Inter', var(--font-fallback);
+  font-family: var(--font-body);
+  font-optical-sizing: auto;
+  font-style: normal;
+
+  --type-smaller-font-size: 0.833rem;
+
+  --type-base-font-size-rem: 1rem;
+  --font-content-line-height: 1.75;
+  --type-article-p: 400 var(--type-base-font-size-rem) /
+    var(--font-content-line-height) var(--font-body);
+
+  --border-primary: #cdcdcd;
+}
+
+:root {
+  --icon-experimental: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWZsYXNrLWNvbmljYWwiPjxwYXRoIGQ9Ik0xMCAydjcuNTI3YTIgMiAwIDAgMS0uMjExLjg5Nkw0LjcyIDIwLjU1YTEgMSAwIDAgMCAuOSAxLjQ1aDEyLjc2YTEgMSAwIDAgMCAuOS0xLjQ1bC01LjA2OS0xMC4xMjdBMiAyIDAgMCAxIDE0IDkuNTI3VjIiLz48cGF0aCBkPSJNOC41IDJoNyIvPjxwYXRoIGQ9Ik03IDE2aDEwIi8+PC9zdmc+);
+  --icon-check: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWNoZWNrIj48cGF0aCBkPSJNMjAgNiA5IDE3bC01LTUiLz48L3N2Zz4=);
+  --icon-x: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWNpcmNsZS14Ij48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIxMCIvPjxwYXRoIGQ9Im0xNSA5LTYgNiIvPjxwYXRoIGQ9Im05IDkgNiA2Ii8+PC9zdmc+);
+}
+
+h1 {
+  font-size: 40px;
+  font-weight: 600;
+}
+
+h2 {
+  font-size: 33px;
+  font-weight: 500;
+}
+
+h3 {
+  font-size: 27.5px;
+  font-weight: 300;
+}
+
+footer {
+  border-top: 1px solid var(--border-primary);
+  padding-block: 3rem;
+  margin-inline: 3rem;
+  margin-block: 3rem;
+}
+
+code {
+  --code-background-inline: #f2f1f1;
+  --elem-radius: 0.25rem;
+  --type-smaller-font-size: 0.833rem;
+  --font-code: Menlo, Consolas, Monaco, Liberation Mono, Lucida Console,
+    monospace;
+
+  background: var(--code-background-inline);
+  padding: 0.125rem 0.25rem;
+  border-radius: var(--elem-radius);
+  font-family: var(--font-code);
+  font-size: var(--type-smaller-font-size);
+  tab-size: 4;
+}
+
+main p {
+  margin: 1rem 0 2rem;
+  font: var(--type-article-p);
+}
+
+main a {
+  --text-link: #0069c2;
+
+  color: var(--text-link);
+
+  &:link {
+    text-decoration: underline;
+  }
+}
+
+main dl > dt {
+  margin-bottom: 0.5rem;
+  margin-top: 2rem;
+}
+
+main dl > dd {
+  margin-bottom: 1rem;
+  margin-left: 1rem;
+}
+
+.main-wrapper {
+  display: grid;
+  gap: 3rem;
+  grid-template-areas: 'sidebar main toc';
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2.5fr) minmax(0, 15rem);
+  padding-left: 1rem;
+  padding-right: 1rem;
+
+  --max-width: 1440px;
+  margin: 0 auto;
+  max-width: var(--max-width);
+}
+
+.main-wrapper > main {
+  grid-area: main;
+}
+
+.icon::after {
+  --color-icon-primary: #696969;
+
+  mask-image: var(--icon-experimental);
+  mask-size: contain;
+  mask-position: center;
+  background-color: var(--color-icon-primary);
+  content: '';
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+}
+
+.icon.inline-icon::after {
+  margin-left: 0.125em;
+}
+
+.visually-hidden {
+  border: 0 !important;
+  clip: rect(1px, 1px, 1px, 1px) !important;
+  clip-path: inset(50%) !important;
+  height: 1px !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  position: absolute !important;
+  white-space: nowrap !important;
+  width: 1px !important;
+}
