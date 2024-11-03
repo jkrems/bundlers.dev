@@ -1,9 +1,0 @@
-{
-  "scripts": {
-    "build": "rm -rf .parcel-cache && parcel build src/index.js"
-  },
-  "dependencies": {
-    "idb": "^5.0.1",
-    "parcel": "^2.0.0"
-  }
-}

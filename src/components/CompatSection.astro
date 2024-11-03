@@ -111,7 +111,6 @@ const compats = collectCompat(Astro.props.feature);
   }
 
   td > button {
-    font-size: inherit;
     padding: 0.5rem 0.25rem;
     display: flex;
     align-items: center;
@@ -184,7 +183,6 @@ const compats = collectCompat(Astro.props.feature);
   <tbody>
     {
       compats.map((compat) => {
-        console.log(compat);
         return (
           <tr>
             <th class="feature-desc">

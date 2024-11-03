@@ -1,9 +1,0 @@
-{
-  "scripts": {
-    "build": "rm -rf .parcel-cache && parcel build src/index.html"
-  },
-  "devDependencies": {
-    "parcel": "^2.0.0",
-    "postcss-modules": "^1.5.0"
-  }
-}

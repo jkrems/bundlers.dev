@@ -1,5 +1,0 @@
-dist
-build
-.parcel-cache
-package-lock.json
-yarn.lock

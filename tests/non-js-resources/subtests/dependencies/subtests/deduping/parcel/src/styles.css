@@ -1,8 +1,0 @@
-@font-face {
-  src: url('./font.ttf');
-  font-family: 'testfont';
-}
-body {
-  font-family: 'testfont';
-  background: url('./image.png');
-}
