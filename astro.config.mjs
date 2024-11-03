@@ -4,7 +4,6 @@ import mdx from '@astrojs/mdx';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://jkrems.dev',
-  base: 'bundlers.dev',
+  site: 'https://bundlers.dev',
   integrations: [mdx()],
 });
