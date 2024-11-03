@@ -48,12 +48,15 @@ const PLATFORMS = [
   },
 ];
 
+interface SupportStatement {
+  version_added: string | boolean | null;
+}
+
 interface CompatEntry {
+  level: number;
   description: string;
   support: {
-    [name: string]: {
-      version_added: string | boolean;
-    };
+    [name: string]: SupportStatement;
   };
   status: {
     experimental: boolean;
@@ -62,21 +65,32 @@ interface CompatEntry {
   };
 }
 
-function collectCompat(feature: object): CompatEntry[] {
+function collectCompat(feature: object, level: number): CompatEntry[] {
   const result: CompatEntry[] = [];
 
   for (const [key, value] of Object.entries(feature)) {
     if (key === '__compat') {
-      result.push(value);
+      result.push({ ...value, level });
     } else {
-      result.push(...collectCompat(value as object));
+      result.push(...collectCompat(value as object, level + 1));
     }
   }
 
   return result;
 }
 
-const compats = collectCompat(Astro.props.feature);
+function formatVersionAdded(support: SupportStatement): string | null {
+  if (!support.version_added) {
+    return 'No';
+  }
+  if (support.version_added === true) {
+    return 'Yes';
+  }
+  const pretty = support.version_added.replace(/(?:\.0)+$/, '');
+  return pretty;
+}
+
+const compats = collectCompat(Astro.props.feature, 0);
 ---
 
 <style>
@@ -85,7 +99,8 @@ const compats = collectCompat(Astro.props.feature);
     --text-primary-red: #d30038;
     --text-primary-green: #007936;
 
-    border-collapse: collapse;
+    border-collapse: initial;
+    border-spacing: 0;
     border: 1px solid var(--color-table-border);
     width: 100%;
   }
@@ -94,19 +109,59 @@ const compats = collectCompat(Astro.props.feature);
     text-align: center;
     vertical-align: bottom;
     padding: 0.25rem;
-    border: 1px solid var(--color-table-border);
 
     font-weight: 500;
     font-size: var(--type-smaller-font-size);
   }
 
+  td,
+  th {
+    border: 1px solid var(--color-table-border);
+    border-top-width: 0;
+    border-right-width: 0;
+
+    font-weight: 500;
+  }
+
+  thead > tr > td {
+    border-width: 0;
+    border-bottom-width: 1px;
+  }
+
   tbody > tr > th {
     vertical-align: middle;
+    border-left-width: 0;
+
+    &.feature-desc {
+      text-align: left;
+
+      &.feature-level-2 {
+        border-left-width: 8px;
+      }
+
+      &.feature-level-3 {
+        border-left-width: 16px;
+      }
+
+      &.feature-level-4 {
+        border-left-width: 24px;
+      }
+
+      &.feature-level-5 {
+        border-left-width: 32px;
+      }
+    }
+  }
+
+  tbody > tr:last-child {
+    & > th,
+    & > td {
+      border-bottom-width: 0;
+    }
   }
 
   td {
     text-align: center;
-    border: 1px solid var(--color-table-border);
     padding: 0;
   }
 
@@ -121,6 +176,7 @@ const compats = collectCompat(Astro.props.feature);
     box-sizing: border-box;
     width: 100%;
     cursor: pointer;
+    font-weight: inherit;
 
     &:hover {
       background-color: #eee;
@@ -134,10 +190,6 @@ const compats = collectCompat(Astro.props.feature);
     line-height: 1;
     padding-inline: 0.5rem;
     position: relative;
-  }
-
-  .feature-desc {
-    text-align: left;
   }
 
   .support-supported {
@@ -185,7 +237,7 @@ const compats = collectCompat(Astro.props.feature);
       compats.map((compat) => {
         return (
           <tr>
-            <th class="feature-desc">
+            <th class:list={['feature-desc', `feature-level-${compat.level}`]}>
               <span set:html={compat.description} />
               {compat.status.experimental && <ExperimentalInline />}
             </th>
@@ -197,6 +249,8 @@ const compats = collectCompat(Astro.props.feature);
                 if (Array.isArray(support)) {
                   support = support[0];
                 }
+                const prettyVersion = formatVersionAdded(support);
+
                 return (
                   <td>
                     <button
@@ -211,11 +265,7 @@ const compats = collectCompat(Astro.props.feature);
                       ) : (
                         <abbr class="icon" />
                       )}
-                      {support.version_added ? (
-                        <div class="version-added">Yes</div>
-                      ) : (
-                        <div class="version-added">No</div>
-                      )}
+                      <div class="version-added">{prettyVersion}</div>
                     </button>
                   </td>
                 );
