@@ -18,6 +18,9 @@
             },
             "nodejs": {
               "version_added": "<23.1.0"
+            },
+            "bun": {
+              "version_added": "<1.1.29"
             }
           },
           "status": {
@@ -41,6 +44,13 @@
                 "notes": [
                   "import.meta.url has file:// protocol"
                 ]
+              },
+              "bun": {
+                "version_added": "<1.1.29",
+                "notes": [
+                  "import.meta.url has file:// protocol",
+                  "Can fetch() the result of import.meta.url"
+                ]
               }
             },
             "status": {
@@ -63,8 +73,11 @@
                 "nodejs": {
                   "version_added": "<23.1.0",
                   "notes": [
-                    "Using the worker_threads API for Worker"
+                    "Using the node:worker_threads API"
                   ]
+                },
+                "bun": {
+                  "version_added": "<1.1.29"
                 }
               },
               "status": {

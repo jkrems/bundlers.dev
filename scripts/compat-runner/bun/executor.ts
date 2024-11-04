@@ -5,23 +5,19 @@ import { ExecTestCaseExecutor, type EnvInfo } from '../executor.ts';
 
 const execFile = promisify(execFileCb);
 
-export class NodejsTestCaseExecutor extends ExecTestCaseExecutor {
+export class BunTestCaseExecutor extends ExecTestCaseExecutor {
   protected getExecPath(): string {
-    return 'node';
+    return 'bun';
   }
 
   protected getExecFlags(): string[] {
-    return [
-      '--no-warnings',
-      '--experimental-strip-types',
-      `--import=${import.meta.resolve('./test-setup.ts')}`,
-    ];
+    return [`--preload=${import.meta.resolve('./test-setup.ts')}`];
   }
 
   protected async getEnvInfo(): Promise<EnvInfo> {
-    const { stdout } = await execFile('node', ['--version']);
+    const { stdout } = await execFile('bun', ['--version']);
     return {
-      id: 'nodejs',
+      id: 'bun',
       version: stdout.trim().replace(/^v/, ''),
     };
   }

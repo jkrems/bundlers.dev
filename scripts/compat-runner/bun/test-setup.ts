@@ -21,8 +21,8 @@ async function runTests() {
 }
 
 Object.assign(globalThis, {
-  __IS_BUN__: false,
-  __IS_NODEJS__: true,
+  __IS_BUN__: true,
+  __IS_NODEJS__: false,
   test: async (description: string, fn: () => Promise<void>) => {
     if (tests.has(description)) {
       throw new Error(`Duplicate test with description: ${description}`);

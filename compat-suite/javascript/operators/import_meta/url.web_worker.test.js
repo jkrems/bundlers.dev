@@ -5,40 +5,48 @@ if (__IS_NODEJS__) {
     const worker = new Worker(
       new URL('./testdata/worker--nodejs.js', import.meta.url),
     );
-    const n = 42;
-    const resp = await Promise.race([
-      new Promise((resolve, reject) => {
-        worker.once('error', reject);
-        worker.once('message', resolve);
+    try {
+      const n = 42;
+      const resp = await Promise.race([
+        new Promise((resolve, reject) => {
+          worker.once('error', reject);
+          worker.once('message', resolve);
 
-        worker.postMessage(n);
-      }),
-      new Promise((_, reject) => {
-        setTimeout(() => {
-          reject(new Error('No response from worker after timeout'));
-        }, 5000);
-      }),
-    ]);
-    expect(resp).toBe(21);
+          worker.postMessage(n);
+        }),
+        new Promise((_, reject) => {
+          setTimeout(() => {
+            reject(new Error('No response from worker after timeout'));
+          }, 5000);
+        }),
+      ]);
+      expect(resp).toBe(21);
+    } finally {
+      worker.terminate();
+    }
   });
 } else {
   test('import.meta.url can load a Worker', async () => {
     const worker = new Worker(new URL('./testdata/worker.js', import.meta.url));
     const n = 42;
-    const resp = await Promise.race([
-      new Promise((resolve, reject) => {
-        worker.onerror = reject;
-        worker.onmessageerror = reject;
-        worker.onmessage = ({ data }) => resolve(data);
+    try {
+      const resp = await Promise.race([
+        new Promise((resolve, reject) => {
+          worker.onerror = reject;
+          worker.onmessageerror = reject;
+          worker.onmessage = ({ data }) => resolve(data);
 
-        worker.postMessage(n);
-      }),
-      new Promise((_, reject) => {
-        setTimeout(() => {
-          reject(new Error('No response from worker after timeout'));
-        }, 5000);
-      }),
-    ]);
-    expect(resp).toBe(21);
+          worker.postMessage(n);
+        }),
+        new Promise((_, reject) => {
+          setTimeout(() => {
+            reject(new Error('No response from worker after timeout'));
+          }, 5000);
+        }),
+      ]);
+      expect(resp).toBe(21);
+    } finally {
+      worker.terminate();
+    }
   });
 }
