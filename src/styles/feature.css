@@ -109,6 +109,7 @@ main dl > dd {
   mask-image: var(--icon-experimental);
   mask-size: contain;
   mask-position: center;
+  mask-repeat: no-repeat;
   background-color: var(--color-icon-primary);
   content: '';
   display: inline-block;

@@ -217,6 +217,48 @@ const compats = collectCompat(Astro.props.feature, 0);
   .icon.icon-notes::after {
     mask-image: var(--icon-asterisk);
   }
+
+  .platform-logo {
+    margin-bottom: 0.3rem;
+  }
+
+  .icon-logo-bun::after {
+    mask-image: url(/public/logos/bun.svg);
+  }
+
+  .icon-logo-deno::after {
+    mask-image: url(/public/logos/deno.svg);
+    mask-mode: luminance;
+  }
+
+  .icon-logo-nodejs::after {
+    mask-image: url(/public/logos/nodejs.svg);
+  }
+
+  .icon-logo-esbuild::after {
+    mask-image: url(/public/logos/esbuild.svg);
+    mask-mode: luminance;
+  }
+
+  .icon-logo-rsbuild::after {
+    mask-image: url(/public/logos/rsbuild.svg);
+    mask-mode: luminance;
+  }
+
+  .icon-logo-rspack::after {
+    mask-image: url(/public/logos/rspack.svg);
+    mask-mode: luminance;
+  }
+
+  .icon-logo-vite::after {
+    mask-image: url(/public/logos/vite.svg);
+    mask-mode: luminance;
+  }
+
+  .icon-logo-webpack::after {
+    mask-image: url(/public/logos/webpack.svg);
+    mask-mode: luminance;
+  }
 </style>
 <h2>Bundler compatibility</h2>
 <table>
@@ -231,6 +273,9 @@ const compats = collectCompat(Astro.props.feature, 0);
           p.children.map((pc) => (
             <th>
               <div class="platform-name-label">{pc.name}</div>
+              <div
+                class:list={['icon', 'platform-logo', `icon-logo-${pc.id}`]}
+              />
             </th>
           )),
         )
