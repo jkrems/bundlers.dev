@@ -162,8 +162,16 @@ const compats = collectCompat(Astro.props.feature, 0);
   }
 
   td {
+    vertical-align: top;
     text-align: center;
     padding: 0;
+  }
+
+  tbody td {
+    cursor: pointer;
+    &:hover {
+      background-color: #eee;
+    }
   }
 
   td > button {
