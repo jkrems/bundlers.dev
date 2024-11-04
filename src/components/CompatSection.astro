@@ -50,6 +50,7 @@ const PLATFORMS = [
 
 interface SupportStatement {
   version_added: string | boolean | null;
+  notes?: string | string[];
 }
 
 interface CompatEntry {
@@ -196,7 +197,7 @@ const compats = collectCompat(Astro.props.feature, 0);
     color: var(--text-primary-green);
   }
 
-  .support-supported > .icon::after {
+  .support-supported > .icon.icon-support::after {
     mask-image: var(--icon-check);
   }
 
@@ -204,13 +205,17 @@ const compats = collectCompat(Astro.props.feature, 0);
     color: var(--text-primary-red);
   }
 
-  .support-unsupported > .icon::after {
+  .support-unsupported > .icon.icon-support::after {
     mask-image: var(--icon-x);
     background-color: var(--text-primary-red);
   }
 
   .status-experimental::after {
     mask-image: var(--icon-experimental);
+  }
+
+  .icon.icon-notes::after {
+    mask-image: var(--icon-asterisk);
   }
 </style>
 <h2>Bundler compatibility</h2>
@@ -260,12 +265,19 @@ const compats = collectCompat(Astro.props.feature, 0);
                           : 'support-unsupported',
                       ]}
                     >
-                      {support.version_added ? (
-                        <abbr class="icon" />
-                      ) : (
-                        <abbr class="icon" />
-                      )}
+                      <abbr
+                        class="icon icon-support"
+                        title={
+                          support.version_added ? 'Full support' : 'No Support'
+                        }
+                      />
                       <div class="version-added">{prettyVersion}</div>
+                      {support.notes?.length && (
+                        <abbr
+                          class="icon icon-notes"
+                          title="See implementation notes."
+                        />
+                      )}
                     </button>
                   </td>
                 );

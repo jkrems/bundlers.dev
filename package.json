@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "update-compat-data": "node --experimental-strip-types ./scripts/compat-runner/main.ts compat-suite/**/*.test.js",
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",

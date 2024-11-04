@@ -15,6 +15,9 @@
             },
             "webpack": {
               "version_added": "5.0.0"
+            },
+            "nodejs": {
+              "version_added": "<23.1.0"
             }
           },
           "status": {
@@ -32,6 +35,12 @@
               },
               "webpack": {
                 "version_added": "5.0.0"
+              },
+              "nodejs": {
+                "version_added": "<23.1.0",
+                "notes": [
+                  "import.meta.url has file:// protocol"
+                ]
               }
             },
             "status": {
@@ -50,6 +59,12 @@
                 },
                 "webpack": {
                   "version_added": "5.0.0"
+                },
+                "nodejs": {
+                  "version_added": "<23.1.0",
+                  "notes": [
+                    "Using the worker_threads API for Worker"
+                  ]
                 }
               },
               "status": {
