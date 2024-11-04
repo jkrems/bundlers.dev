@@ -11,6 +11,7 @@
   "devDependencies": {
     "@astrojs/mdx": "^3.1.9",
     "astro": "^4.16.8",
+    "expect": "^29.7.0",
     "husky": "^9.1.6",
     "lint-staged": "^15.2.10",
     "lucide": "^0.454.0",
