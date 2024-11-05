@@ -38,11 +38,13 @@ export abstract class TestCaseExecutor {
 }
 
 function parseSubPath(base: string): string[] {
+  // Remove ~env suffix first.
+  base = base.replace(/~\w+$/, '');
   if (base === '_') return [];
   return base.split('.');
 }
 
-function toTestSuiteResult(
+export function toTestSuiteResult(
   env: { id: string; version: string },
   filename: string,
   results: TestResult[],

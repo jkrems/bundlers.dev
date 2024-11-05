@@ -1,17 +1,35 @@
-import { glob, readFile, writeFile } from 'node:fs/promises';
+import { glob, readFile, writeFile, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import { BunTestCaseExecutor } from './bun/executor.ts';
 import { DenoTestCaseExecutor } from './deno/executor.ts';
 import { NodejsTestCaseExecutor } from './nodejs/executor.ts';
+import { EsbuildTestCaseExecutor } from './esbuild/executor.ts';
 
-async function getTestSuites(globs: string[], cwd: string) {
+async function getTestSuites(
+  globs: string[],
+  { cwd, envId }: { cwd: string; envId: string },
+) {
   const suites: string[] = [];
+  const envSuffix = `~${envId}.test.js`;
 
   const matches = await glob(globs, {
     cwd,
   });
   for await (const match of matches) {
+    if (/~\w+\.test\./.test(match)) {
+      continue;
+    }
+    const envMatch = match.replace(/\.test\.js$/, envSuffix);
+    try {
+      await stat(join(cwd, envMatch));
+      suites.push(envMatch);
+      continue;
+    } catch (e) {
+      if ((e as any).code !== 'ENOENT') {
+        throw e;
+      }
+    }
     suites.push(match);
   }
 
@@ -62,6 +80,9 @@ function summarizeSupport(support: SupportStatement): string {
 
 function createExecutor(envId: string) {
   switch (envId) {
+    case 'esbuild':
+      return new EsbuildTestCaseExecutor();
+
     case 'bun':
       return new BunTestCaseExecutor();
 
@@ -89,7 +110,7 @@ async function main(argv: string[]) {
 
   const cwd = process.cwd();
 
-  const testSuites = await getTestSuites(globs, cwd);
+  const testSuites = await getTestSuites(globs, { cwd, envId: envIdFilter });
 
   const executor = createExecutor(envIdFilter);
 

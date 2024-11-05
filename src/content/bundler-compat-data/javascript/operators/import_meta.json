@@ -24,6 +24,9 @@
             },
             "deno": {
               "version_added": "<1.46.3"
+            },
+            "esbuild": {
+              "version_added": "<0.24.0"
             }
           },
           "status": {
@@ -61,6 +64,9 @@
                   "import.meta.url has file:// protocol",
                   "Can fetch() the result of import.meta.url"
                 ]
+              },
+              "esbuild": {
+                "version_added": false
               }
             },
             "status": {
@@ -91,6 +97,9 @@
                 },
                 "deno": {
                   "version_added": "<1.46.3"
+                },
+                "esbuild": {
+                  "version_added": false
                 }
               },
               "status": {
