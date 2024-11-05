@@ -1,8 +1,9 @@
 import { glob, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-import { NodejsTestCaseExecutor } from './nodejs/executor.ts';
 import { BunTestCaseExecutor } from './bun/executor.ts';
+import { DenoTestCaseExecutor } from './deno/executor.ts';
+import { NodejsTestCaseExecutor } from './nodejs/executor.ts';
 
 async function getTestSuites(globs: string[], cwd: string) {
   const suites: string[] = [];
@@ -61,11 +62,14 @@ function summarizeSupport(support: SupportStatement): string {
 
 function createExecutor(envId: string) {
   switch (envId) {
-    case 'nodejs':
-      return new NodejsTestCaseExecutor();
-
     case 'bun':
       return new BunTestCaseExecutor();
+
+    case 'deno':
+      return new DenoTestCaseExecutor();
+
+    case 'nodejs':
+      return new NodejsTestCaseExecutor();
 
     default:
       throw new Error(`No executor for '${envId}'`);

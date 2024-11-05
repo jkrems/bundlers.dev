@@ -1,4 +1,4 @@
-import { expect } from 'expect';
+import { expect } from 'npm:expect';
 
 type TestFunction = () => void | Promise<void>;
 
@@ -17,18 +17,18 @@ async function runTests() {
     }
     console.log(JSON.stringify({ description, error }));
   }
-  process.exit(0);
+  Deno.exit(0);
 }
 
 Object.assign(globalThis, {
-  __IS_NODEJS__: !!process.versions.node && !process.versions.bun,
+  __IS_NODEJS__: false,
   test: async (description: string, fn: () => Promise<void>) => {
     if (tests.has(description)) {
       throw new Error(`Duplicate test with description: ${description}`);
     }
     tests.set(description, fn);
-
-    queueMicrotask(runTests);
   },
   expect,
 });
+
+await import(`../../../${Deno.args[0]}`).then(() => runTests());

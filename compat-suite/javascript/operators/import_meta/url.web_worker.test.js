@@ -27,7 +27,10 @@ if (__IS_NODEJS__) {
   });
 } else {
   test('import.meta.url can load a Worker', async () => {
-    const worker = new Worker(new URL('./testdata/worker.js', import.meta.url));
+    const worker = new Worker(
+      new URL('./testdata/worker.js', import.meta.url),
+      { type: 'module' },
+    );
     const n = 42;
     try {
       const resp = await Promise.race([

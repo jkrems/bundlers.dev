@@ -21,6 +21,9 @@
             },
             "bun": {
               "version_added": "<1.1.29"
+            },
+            "deno": {
+              "version_added": "<1.46.3"
             }
           },
           "status": {
@@ -47,6 +50,13 @@
               },
               "bun": {
                 "version_added": "<1.1.29",
+                "notes": [
+                  "import.meta.url has file:// protocol",
+                  "Can fetch() the result of import.meta.url"
+                ]
+              },
+              "deno": {
+                "version_added": "<1.46.3",
                 "notes": [
                   "import.meta.url has file:// protocol",
                   "Can fetch() the result of import.meta.url"
@@ -78,6 +88,9 @@
                 },
                 "bun": {
                   "version_added": "<1.1.29"
+                },
+                "deno": {
+                  "version_added": "<1.46.3"
                 }
               },
               "status": {
