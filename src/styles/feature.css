@@ -103,14 +103,21 @@ main dl > dd {
   grid-area: main;
 }
 
-.icon::after {
+.icon {
   --color-icon-primary: #696969;
 
-  mask-image: var(--icon-experimental);
+  --_icon__image: var(--icon__image, var(--icon-experimental));
+  --_icon__mode: var(--icon__mode, match-source);
+  --_icon__color: var(--icon__color, var(--color-icon-primary));
+}
+
+.icon::after {
+  mask-image: var(--_icon__image);
   mask-size: contain;
   mask-position: center;
   mask-repeat: no-repeat;
-  background-color: var(--color-icon-primary);
+  mask-mode: var(--_icon__mode);
+  background-color: var(--_icon__color);
   content: '';
   display: inline-block;
   width: 1em;
