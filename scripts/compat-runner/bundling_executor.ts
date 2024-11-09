@@ -26,6 +26,9 @@ function getContentType(filename: string): string {
     case '.js':
       return 'text/javascript';
 
+    case '.txt':
+      return 'text/plain';
+
     default:
       throw new Error(`TODO: Handle extension ${extname(filename)}`);
   }
@@ -120,7 +123,10 @@ Object.assign(globalThis, {
     browser: Browser,
     pageContext: PageContext,
   ): Promise<TestResult[]> {
-    await this.setupPageContext(filename, cwd, pageContext);
+    const earlyErrors = await this.setupPageContext(filename, cwd, pageContext);
+    if (earlyErrors) {
+      return earlyErrors;
+    }
 
     const pageErrors: Error[] = [];
 

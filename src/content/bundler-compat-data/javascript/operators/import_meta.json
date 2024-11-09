@@ -43,7 +43,11 @@
                 "version_added": "1.0.0"
               },
               "webpack": {
-                "version_added": "5.0.0"
+                "version_added": "5.0.0",
+                "notes": [
+                  "import.meta.url has file:// protocol",
+                  "Can fetch() the result of import.meta.url"
+                ]
               },
               "nodejs": {
                 "version_added": "<23.1.0",
