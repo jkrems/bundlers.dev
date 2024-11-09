@@ -77,7 +77,7 @@ export function CompatTable({ platforms, compats }: CompatTableProps) {
 
   const activeCompatEntry = useSignal<
     [number, string, SupportHistoryEntry[]] | null
-  >([0, 'nodejs', normalizeSupport(compats[0].support['nodejs'])]);
+  >(null);
 
   const compatsBeforeDetails = useComputed(() => {
     if (!activeCompatEntry.value) {
