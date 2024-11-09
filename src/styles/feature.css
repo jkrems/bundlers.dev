@@ -7,6 +7,10 @@
   font-optical-sizing: auto;
   font-style: normal;
 
+  --text-primary: #1b1b1b;
+  --text-primary-red: #d30038;
+  --text-primary-green: #007936;
+
   --type-smaller-font-size: 0.833rem;
 
   --type-base-font-size-rem: 1rem;
@@ -127,6 +131,52 @@ main dl > dd {
 
 .icon.inline-icon::after {
   margin-left: 0.125em;
+}
+
+.icon-experimental {
+  --icon__image: var(--icon-experimental);
+}
+
+.icon.icon-notes {
+  --icon__image: var(--icon-asterisk);
+}
+
+.icon-logo-bun {
+  --icon__image: url(/logos/bun.svg);
+}
+
+.icon-logo-deno {
+  --icon__image: url(/logos/deno.svg);
+  --icon__mode: luminance;
+}
+
+.icon-logo-nodejs {
+  --icon__image: url(/logos/nodejs.svg);
+}
+
+.icon-logo-esbuild {
+  --icon__image: url(/logos/esbuild.svg);
+  --icon__mode: luminance;
+}
+
+.icon-logo-rsbuild {
+  --icon__image: url(/logos/rsbuild.svg);
+  --icon__mode: luminance;
+}
+
+.icon-logo-rspack {
+  --icon__image: url(/logos/rspack.svg);
+  --icon__mode: luminance;
+}
+
+.icon-logo-vite {
+  --icon__image: url(/logos/vite.svg);
+  --icon__mode: luminance;
+}
+
+.icon-logo-webpack {
+  --icon__image: url(/logos/webpack.svg);
+  --icon__mode: luminance;
 }
 
 .visually-hidden {

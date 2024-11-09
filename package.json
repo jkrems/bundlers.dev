@@ -29,5 +29,9 @@
     "*.{js,css,json,md,ts,tsx}": [
       "prettier --write"
     ]
+  },
+  "dependencies": {
+    "@astrojs/preact": "^3.5.3",
+    "preact": "^10.24.3"
   }
 }
