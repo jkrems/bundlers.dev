@@ -19,6 +19,8 @@ import {
 export interface PageContext {
   id: string;
   files: Map<string, string | Uint8Array>;
+  mainUrl: string;
+  mainIsModule: boolean;
 }
 
 function getContentType(filename: string): string {
@@ -101,7 +103,7 @@ Object.assign(globalThis, {
 });
 })();
 </script>
-<script src="/${pageContext.id}/main.js"></script>`);
+<script src="/${pageContext.id}${pageContext.mainUrl}"${pageContext.mainIsModule ? ' type="module"' : ''}></script>`);
       return;
     }
 
@@ -190,6 +192,8 @@ Object.assign(globalThis, {
       const pageContext: PageContext = {
         id: crypto.randomUUID(),
         files: new Map<string, string>(),
+        mainUrl: '/main.js',
+        mainIsModule: false,
       };
       this.#pageContexts.set(pageContext.id, pageContext);
       const results = await this.#runTestCase(

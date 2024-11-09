@@ -7,6 +7,7 @@ import { NodejsTestCaseExecutor } from './nodejs/executor.ts';
 import { EsbuildTestCaseExecutor } from './esbuild/executor.ts';
 import type { TestCaseExecutor, TestSuiteResult } from './executor.ts';
 import { WebpackTestCaseExecutor } from './webpack/executor.ts';
+import { ViteTestCaseExecutor } from './vite/executor.ts';
 
 async function getTestSuites(
   globs: string[],
@@ -97,6 +98,7 @@ const PLATFORMS = new Map<string, PlatformInfo>([
     'nodejs',
     { id: 'nodejs', type: 'runtime', Executor: NodejsTestCaseExecutor },
   ],
+  ['vite', { id: 'vite', type: 'bundler', Executor: ViteTestCaseExecutor }],
   [
     'webpack',
     { id: 'webpack', type: 'bundler', Executor: WebpackTestCaseExecutor },
