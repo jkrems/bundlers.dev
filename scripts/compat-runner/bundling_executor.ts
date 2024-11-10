@@ -13,8 +13,9 @@ import {
   type TestResult,
   type TestSuiteResult,
   toTestSuiteResult,
-  type EnvInfo,
+  type PlatformInfo,
 } from './executor.ts';
+import type { PlatformId } from './compat_data_schema.ts';
 
 export interface PageContext {
   id: string;
@@ -36,8 +37,10 @@ function getContentType(filename: string): string {
   }
 }
 
-export abstract class BundlingTestCaseExecutor extends TestCaseExecutor {
-  protected abstract getEnvInfo(): Promise<EnvInfo>;
+export abstract class BundlingTestCaseExecutor<
+  T extends PlatformId,
+> extends TestCaseExecutor<T> {
+  protected abstract getPlatformInfo(): Promise<PlatformInfo<T>>;
   protected abstract setupPageContext(
     filename: string,
     cwd: string,
@@ -195,11 +198,11 @@ setTimeout(runTests, 150);
   async run(
     filenames: string[],
     cwd: string,
-  ): Promise<Map<string, TestSuiteResult>> {
+  ): Promise<Map<string, TestSuiteResult<T>>> {
     const browser = await chromium.launch();
-    const env = await this.getEnvInfo();
+    const env = await this.getPlatformInfo();
 
-    const suites = new Map<string, TestSuiteResult>();
+    const suites = new Map<string, TestSuiteResult<T>>();
     for (const filename of filenames) {
       const pageContext: PageContext = {
         id: crypto.randomUUID(),

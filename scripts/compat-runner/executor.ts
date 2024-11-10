@@ -2,6 +2,8 @@ import { execFile as execFileCb } from 'node:child_process';
 import { promisify } from 'node:util';
 import { relative, dirname, basename } from 'node:path';
 
+import type { Platform, PlatformId } from './compat_data_schema';
+
 const execFile = promisify(execFileCb);
 
 export interface TestResult {
@@ -12,13 +14,12 @@ export interface TestResult {
   };
 }
 
-export interface EnvInfo {
-  id: string;
+export interface PlatformInfo<T extends PlatformId> extends Platform<T> {
   version: string;
 }
 
-export interface TestSuiteResult {
-  env: EnvInfo;
+export interface TestSuiteResult<T extends PlatformId> {
+  env: PlatformInfo<T>;
   filename: string;
   compatGroup: string;
   compatSubpath: string[];
@@ -31,11 +32,11 @@ export interface TestSuiteResult {
   results: TestResult[];
 }
 
-export abstract class TestCaseExecutor {
+export abstract class TestCaseExecutor<T extends PlatformId> {
   abstract run(
     filenames: string[],
     cwd: string,
-  ): Promise<Map<string, TestSuiteResult>>;
+  ): Promise<Map<string, TestSuiteResult<T>>>;
 }
 
 function parseSubPath(base: string): string[] {
@@ -45,11 +46,11 @@ function parseSubPath(base: string): string[] {
   return base.split('.');
 }
 
-export function toTestSuiteResult(
-  env: { id: string; version: string },
+export function toTestSuiteResult<T extends PlatformId>(
+  platform: PlatformInfo<T>,
   filename: string,
   results: TestResult[],
-): TestSuiteResult {
+): TestSuiteResult<T> {
   let pass = 0;
   let fail = 0;
   let total = 0;
@@ -90,7 +91,7 @@ export function toTestSuiteResult(
     throw new Error(`Cannot generate partial success without notes`);
   }
   return {
-    env,
+    env: platform,
     filename,
     compatGroup,
     compatSubpath,
@@ -104,10 +105,12 @@ export function toTestSuiteResult(
   };
 }
 
-export abstract class ExecTestCaseExecutor extends TestCaseExecutor {
+export abstract class ExecTestCaseExecutor<
+  T extends PlatformId,
+> extends TestCaseExecutor<T> {
   protected abstract getExecPath(): string;
   protected abstract getExecFlags(): string[];
-  protected abstract getEnvInfo(): Promise<EnvInfo>;
+  protected abstract getPlatformInfo(): Promise<PlatformInfo<T>>;
 
   async #runTestCase(filename: string, cwd: string): Promise<TestResult[]> {
     try {
@@ -140,10 +143,10 @@ export abstract class ExecTestCaseExecutor extends TestCaseExecutor {
   async run(
     filenames: string[],
     cwd: string,
-  ): Promise<Map<string, TestSuiteResult>> {
-    const env = await this.getEnvInfo();
+  ): Promise<Map<string, TestSuiteResult<T>>> {
+    const env = await this.getPlatformInfo();
 
-    const suites = new Map<string, TestSuiteResult>();
+    const suites = new Map<string, TestSuiteResult<T>>();
     for (const filename of filenames) {
       const results = await this.#runTestCase(filename, cwd);
       suites.set(filename, toTestSuiteResult(env, filename, results));

@@ -1,11 +1,12 @@
 import { execFile as execFileCb } from 'node:child_process';
 import { promisify } from 'node:util';
 
-import { ExecTestCaseExecutor, type EnvInfo } from '../executor.ts';
+import { ExecTestCaseExecutor, type PlatformInfo } from '../executor.ts';
+import { PLATFORMS } from '../compat_data_schema.ts';
 
 const execFile = promisify(execFileCb);
 
-export class BunTestCaseExecutor extends ExecTestCaseExecutor {
+export class BunTestCaseExecutor extends ExecTestCaseExecutor<'bun'> {
   protected getExecPath(): string {
     return 'bun';
   }
@@ -14,10 +15,10 @@ export class BunTestCaseExecutor extends ExecTestCaseExecutor {
     return [`--preload=${import.meta.resolve('./test-setup.ts')}`];
   }
 
-  protected async getEnvInfo(): Promise<EnvInfo> {
+  protected async getPlatformInfo(): Promise<PlatformInfo<'bun'>> {
     const { stdout } = await execFile('bun', ['--version']);
     return {
-      id: 'bun',
+      ...PLATFORMS.bun,
       version: stdout.trim().replace(/^v/, ''),
     };
   }

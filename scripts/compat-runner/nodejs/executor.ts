@@ -1,11 +1,12 @@
 import { execFile as execFileCb } from 'node:child_process';
 import { promisify } from 'node:util';
 
-import { ExecTestCaseExecutor, type EnvInfo } from '../executor.ts';
+import { ExecTestCaseExecutor, type PlatformInfo } from '../executor.ts';
+import { PLATFORMS } from '../compat_data_schema.ts';
 
 const execFile = promisify(execFileCb);
 
-export class NodejsTestCaseExecutor extends ExecTestCaseExecutor {
+export class NodejsTestCaseExecutor extends ExecTestCaseExecutor<'nodejs'> {
   protected getExecPath(): string {
     return 'node';
   }
@@ -18,10 +19,10 @@ export class NodejsTestCaseExecutor extends ExecTestCaseExecutor {
     ];
   }
 
-  protected async getEnvInfo(): Promise<EnvInfo> {
+  protected async getPlatformInfo(): Promise<PlatformInfo<'nodejs'>> {
     const { stdout } = await execFile('node', ['--version']);
     return {
-      id: 'nodejs',
+      ...PLATFORMS.nodejs,
       version: stdout.trim().replace(/^v/, ''),
     };
   }

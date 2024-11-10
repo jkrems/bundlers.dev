@@ -1,16 +1,17 @@
 import { build, version } from 'esbuild';
 import { join, relative } from 'node:path';
 
-import { type TestResult, type EnvInfo } from '../executor.ts';
+import { type TestResult, type PlatformInfo } from '../executor.ts';
 import {
   BundlingTestCaseExecutor,
   type PageContext,
 } from '../bundling_executor.ts';
+import { PLATFORMS } from '../compat_data_schema.ts';
 
-export class EsbuildTestCaseExecutor extends BundlingTestCaseExecutor {
-  protected override async getEnvInfo(): Promise<EnvInfo> {
+export class EsbuildTestCaseExecutor extends BundlingTestCaseExecutor<'esbuild'> {
+  protected override async getPlatformInfo(): Promise<PlatformInfo<'esbuild'>> {
     return {
-      id: 'esbuild',
+      ...PLATFORMS.esbuild,
       version,
     };
   }

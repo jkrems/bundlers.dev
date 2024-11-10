@@ -1,16 +1,17 @@
 import { join } from 'node:path';
 import { build, version } from 'vite';
 
-import { type TestResult, type EnvInfo } from '../executor.ts';
+import { type TestResult, type PlatformInfo } from '../executor.ts';
 import {
   BundlingTestCaseExecutor,
   type PageContext,
 } from '../bundling_executor.ts';
+import { PLATFORMS } from '../compat_data_schema.ts';
 
-export class ViteTestCaseExecutor extends BundlingTestCaseExecutor {
-  protected override async getEnvInfo(): Promise<EnvInfo> {
+export class ViteTestCaseExecutor extends BundlingTestCaseExecutor<'vite'> {
+  protected override async getPlatformInfo(): Promise<PlatformInfo<'vite'>> {
     return {
-      id: 'vite',
+      ...PLATFORMS.vite,
       version: version,
     };
   }
@@ -59,6 +60,7 @@ export class ViteTestCaseExecutor extends BundlingTestCaseExecutor {
         continue;
       }
       for (const outFile of out.output) {
+        const outFileType = outFile.type;
         if (outFile.type === 'chunk') {
           const urlPath = `/${outFile.fileName}`;
           if (outFile.name === 'main') {
@@ -70,7 +72,7 @@ export class ViteTestCaseExecutor extends BundlingTestCaseExecutor {
           const urlPath = `/${outFile.fileName}`;
           pageContext.files.set(urlPath, outFile.source);
         } else {
-          throw new Error(`TODO: Implement outFile.type == ${outFile.type}`);
+          throw new Error(`TODO: Implement outFile.type == ${outFileType}`);
         }
       }
     }

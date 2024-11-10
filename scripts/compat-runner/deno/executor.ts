@@ -1,11 +1,12 @@
 import { execFile as execFileCb } from 'node:child_process';
 import { promisify } from 'node:util';
 
-import { ExecTestCaseExecutor, type EnvInfo } from '../executor.ts';
+import { ExecTestCaseExecutor, type PlatformInfo } from '../executor.ts';
+import { PLATFORMS } from '../compat_data_schema.ts';
 
 const execFile = promisify(execFileCb);
 
-export class DenoTestCaseExecutor extends ExecTestCaseExecutor {
+export class DenoTestCaseExecutor extends ExecTestCaseExecutor<'deno'> {
   protected getExecPath(): string {
     return 'deno';
   }
@@ -22,7 +23,7 @@ export class DenoTestCaseExecutor extends ExecTestCaseExecutor {
     ];
   }
 
-  protected async getEnvInfo(): Promise<EnvInfo> {
+  protected async getPlatformInfo(): Promise<PlatformInfo<'deno'>> {
     // Example output:
     // $ deno --version
     // deno 1.46.3 (stable, release, aarch64-apple-darwin)
@@ -34,7 +35,7 @@ export class DenoTestCaseExecutor extends ExecTestCaseExecutor {
       throw new Error(`Could not find deno version in ${stdout}`);
     }
     return {
-      id: 'deno',
+      ...PLATFORMS.deno,
       version: denoMatch[1],
     };
   }

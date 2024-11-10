@@ -7,16 +7,17 @@ import {
 import { createFsFromVolume, Volume } from 'memfs';
 import { join } from 'node:path';
 
-import { type TestResult, type EnvInfo } from '../executor.ts';
+import { type TestResult, type PlatformInfo } from '../executor.ts';
 import {
   BundlingTestCaseExecutor,
   type PageContext,
 } from '../bundling_executor.ts';
+import { PLATFORMS } from '../compat_data_schema.ts';
 
-export class WebpackTestCaseExecutor extends BundlingTestCaseExecutor {
-  protected override async getEnvInfo(): Promise<EnvInfo> {
+export class WebpackTestCaseExecutor extends BundlingTestCaseExecutor<'webpack'> {
+  protected override async getPlatformInfo(): Promise<PlatformInfo<'webpack'>> {
     return {
-      id: 'webpack',
+      ...PLATFORMS.webpack,
       version: webpack.version,
     };
   }

@@ -1,17 +1,18 @@
 import { createRsbuild, version } from '@rsbuild/core';
-import { join, relative } from 'node:path';
+import { join } from 'node:path';
 import { createFsFromVolume, Volume } from 'memfs';
 
-import { type TestResult, type EnvInfo } from '../executor.ts';
+import { type TestResult, type PlatformInfo } from '../executor.ts';
 import {
   BundlingTestCaseExecutor,
   type PageContext,
 } from '../bundling_executor.ts';
+import { PLATFORMS } from '../compat_data_schema.ts';
 
-export class RsbuildTestCaseExecutor extends BundlingTestCaseExecutor {
-  protected override async getEnvInfo(): Promise<EnvInfo> {
+export class RsbuildTestCaseExecutor extends BundlingTestCaseExecutor<'rsbuild'> {
+  protected override async getPlatformInfo(): Promise<PlatformInfo<'rsbuild'>> {
     return {
-      id: 'rsbuild',
+      ...PLATFORMS.rsbuild,
       version,
     };
   }

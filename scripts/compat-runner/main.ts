@@ -1,6 +1,7 @@
 import { glob, readFile, writeFile, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 import { Range } from 'semver';
+import { parseArgs } from 'node:util';
 
 import { BunTestCaseExecutor } from './bun/executor.ts';
 import { DenoTestCaseExecutor } from './deno/executor.ts';
@@ -11,13 +12,14 @@ import { WebpackTestCaseExecutor } from './webpack/executor.ts';
 import { ViteTestCaseExecutor } from './vite/executor.ts';
 import { RspackTestCaseExecutor } from './rspack/executor.ts';
 import { RsbuildTestCaseExecutor } from './rsbuild/executor.ts';
+import { PLATFORMS, type PlatformId } from './compat_data_schema.ts';
 
 async function getTestSuites(
   globs: string[],
-  { cwd, envId }: { cwd: string; envId: string },
+  { cwd, platformId }: { cwd: string; platformId: PlatformId },
 ) {
   const suites: string[] = [];
-  const envSuffix = `~${envId}.test.js`;
+  const platformSuffix = `~${platformId}.test.js`;
 
   const matches = await glob(globs, {
     cwd,
@@ -26,10 +28,10 @@ async function getTestSuites(
     if (/~\w+\.test\./.test(match)) {
       continue;
     }
-    const envMatch = match.replace(/\.test\.js$/, envSuffix);
+    const platformMatch = match.replace(/\.test\.js$/, platformSuffix);
     try {
-      await stat(join(cwd, envMatch));
-      suites.push(envMatch);
+      await stat(join(cwd, platformMatch));
+      suites.push(platformMatch);
       continue;
     } catch (e) {
       if ((e as any).code !== 'ENOENT') {
@@ -84,56 +86,40 @@ function summarizeSupport(support: SupportStatement): string {
   return `${support.version_added}${support.partial_implementation ? ' [partial]' : ''}`;
 }
 
-interface PlatformInfo {
-  id: string;
-  type: 'bundler' | 'runtime';
-  Executor: { new (): TestCaseExecutor };
-}
+const EXECUTORS: {
+  [K in PlatformId]: { new (): TestCaseExecutor<K> };
+} = {
+  bun: BunTestCaseExecutor,
+  deno: DenoTestCaseExecutor,
+  esbuild: EsbuildTestCaseExecutor,
+  nodejs: NodejsTestCaseExecutor,
+  rsbuild: RsbuildTestCaseExecutor,
+  rspack: RspackTestCaseExecutor,
+  vite: ViteTestCaseExecutor,
+  webpack: WebpackTestCaseExecutor,
+};
 
-const PLATFORMS = new Map<string, PlatformInfo>([
-  ['bun', { id: 'bun', type: 'runtime', Executor: BunTestCaseExecutor }],
-  ['deno', { id: 'deno', type: 'runtime', Executor: DenoTestCaseExecutor }],
-  [
-    'esbuild',
-    { id: 'esbuild', type: 'bundler', Executor: EsbuildTestCaseExecutor },
-  ],
-  [
-    'nodejs',
-    { id: 'nodejs', type: 'runtime', Executor: NodejsTestCaseExecutor },
-  ],
-  [
-    'rsbuild',
-    { id: 'rsbuild', type: 'bundler', Executor: RsbuildTestCaseExecutor },
-  ],
-  [
-    'rspack',
-    { id: 'rspack', type: 'bundler', Executor: RspackTestCaseExecutor },
-  ],
-  ['vite', { id: 'vite', type: 'bundler', Executor: ViteTestCaseExecutor }],
-  [
-    'webpack',
-    { id: 'webpack', type: 'bundler', Executor: WebpackTestCaseExecutor },
-  ],
-]);
+function createExecutor(platformId: PlatformId) {
+  const Executor = EXECUTORS[platformId];
 
-function createExecutor(envId: string) {
-  const platform = PLATFORMS.get(envId);
-
-  if (!platform) {
-    throw new Error(`No executor for '${envId}'`);
+  if (!Executor) {
+    throw new Error(`No executor for '${platformId}'`);
   }
 
-  return new platform.Executor();
+  return new Executor();
 }
 
-async function runForEnvId(
-  envId: string,
+async function runForPlatformId(
+  platformId: PlatformId,
   globs: string[],
   { cwd }: { cwd: string },
-): Promise<Map<string, TestSuiteResult>> {
-  const executor = createExecutor(envId);
+): Promise<Map<string, TestSuiteResult<PlatformId>>> {
+  const executor = createExecutor(platformId);
 
-  const testSuites = await getTestSuites(globs, { cwd, envId });
+  const testSuites = await getTestSuites(globs, {
+    cwd,
+    platformId,
+  });
 
   const results = await executor.run(testSuites, process.cwd());
 
@@ -141,7 +127,7 @@ async function runForEnvId(
 }
 
 async function applyTestResults(
-  results: Map<string, TestSuiteResult>,
+  results: Map<string, TestSuiteResult<PlatformId>>,
   { cwd, isDryRun }: { cwd: string; isDryRun: boolean },
 ) {
   for (const result of results.values()) {
@@ -222,48 +208,75 @@ async function applyTestResults(
   }
 }
 
-const DEFAULT_ENV_IDS = ['nodejs'];
+const DEFAULT_PLATFORM_IDS: PlatformId[] = ['nodejs'];
 
-function parseEnvFilter(envFilter: string[]) {
-  if (envFilter.length === 0) {
-    return DEFAULT_ENV_IDS;
+function castPlatformId(id: string): PlatformId {
+  if (PLATFORMS.hasOwnProperty(id)) {
+    return id as PlatformId;
+  }
+  throw new Error(`Unrecognized platform id '${id}'`);
+}
+
+function parsePlatformFilter(platformFilter: string[]): PlatformId[] {
+  if (platformFilter.length === 0) {
+    return DEFAULT_PLATFORM_IDS;
   }
 
   return Array.from(
     new Set(
-      envFilter.flatMap((filter) => {
+      platformFilter.flatMap((filter) => {
+        const allPlatforms: PlatformId[] = Array.from(
+          Object.values(PLATFORMS),
+          (p) => p.id,
+        );
         if (filter === '*') {
-          return [...PLATFORMS.keys()];
+          return allPlatforms;
         } else if (filter === 'bundler' || filter === 'runtime') {
-          return [...PLATFORMS.keys()].filter((id) => {
-            return PLATFORMS.get(id)?.type === filter;
+          return allPlatforms.filter((id: PlatformId) => {
+            return PLATFORMS[id].type === filter;
           });
         }
-        return filter.split(',');
+        return filter.split(',').map(castPlatformId);
       }),
     ),
   );
 }
 
 async function main(argv: string[]) {
-  const globs = argv.filter((arg) => !arg.startsWith('-'));
+  const {
+    values: { platform: platformFilter, dry: isDryRun },
+    positionals: globs,
+  } = parseArgs({
+    args: argv,
+    options: {
+      platform: {
+        type: 'string',
+        multiple: true,
+        default: [],
+      },
+      dry: {
+        type: 'boolean',
+        default: false,
+      },
+    },
+    allowPositionals: true,
+  });
+
   if (globs.length === 0) {
     throw new Error('Expected test file patterns');
   }
 
-  const isDryRun = argv.includes('--dry');
-  const envIdFilter = argv
-    .filter((arg) => arg.startsWith('--env='))
-    .map((arg) => arg.slice('--env='.length));
-  const envIds = parseEnvFilter(envIdFilter);
+  const platformIds = parsePlatformFilter(platformFilter);
 
   const cwd = process.cwd();
 
-  const resultsByEnv = await Promise.all(
-    envIds.map((envId) => runForEnvId(envId, globs, { cwd })),
+  const resultsByPlatform = await Promise.all(
+    platformIds.map((platformId) =>
+      runForPlatformId(platformId, globs, { cwd }),
+    ),
   );
 
-  for (const results of resultsByEnv) {
+  for (const results of resultsByPlatform) {
     await applyTestResults(results, { cwd, isDryRun });
   }
 }
