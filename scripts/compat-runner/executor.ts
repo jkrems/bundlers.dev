@@ -24,6 +24,7 @@ export interface TestSuiteResult {
   compatSubpath: string[];
   notes: string[];
   ok: boolean;
+  partial: boolean;
   pass: number;
   fail: number;
   total: number;
@@ -51,30 +52,46 @@ export function toTestSuiteResult(
 ): TestSuiteResult {
   let pass = 0;
   let fail = 0;
-  let total = results.length;
+  let total = 0;
+  const failureNotes: string[] = [];
   const notes = new Set<string>();
   for (const result of results) {
     if (result.description.startsWith('NOTE: ')) {
       if (!result.error) {
+        ++pass;
+        ++total;
         notes.add(result.description.slice('NOTE: '.length));
+      }
+      continue;
+    } else if (result.description.startsWith('NOTE/FAIL: ')) {
+      if (result.error) {
+        notes.add(result.description.slice('NOTE/FAIL: '.length));
       }
       continue;
     }
     if (result.error) {
+      failureNotes.push(result.description);
       ++fail;
+      ++total;
     } else {
       ++pass;
+      ++total;
     }
   }
   const compatGroup = dirname(relative('compat-suite', filename));
   const compatSubpath = parseSubPath(basename(filename, '.test.js'));
+  const partial = total > 0 && fail > 0 && pass > 0;
   return {
     env,
     filename,
     compatGroup,
     compatSubpath,
-    notes: [...notes],
+    notes: [
+      ...notes,
+      ...(partial ? failureNotes.map((n) => `Fails: ${n}`) : []),
+    ],
     ok: total > 0 && fail === 0,
+    partial,
     pass,
     fail,
     total,

@@ -4,7 +4,14 @@ type TestFunction = () => void | Promise<void>;
 
 const tests = new Map<string, TestFunction>();
 
+let ranTests = false;
+
 async function runTests() {
+  if (ranTests) {
+    return;
+  }
+  ranTests = true;
+
   for (const [description, fn] of tests) {
     let error = null;
     try {
@@ -24,6 +31,9 @@ Object.assign(globalThis, {
   test: async (description: string, fn: () => Promise<void>) => {
     if (tests.has(description)) {
       throw new Error(`Duplicate test with description: ${description}`);
+    }
+    if (ranTests) {
+      throw new Error(`Non-synchronous test registration for ${description}`);
     }
     tests.set(description, fn);
 

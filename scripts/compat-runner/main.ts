@@ -81,7 +81,7 @@ function assertCompatNode(
 }
 
 function summarizeSupport(support: SupportStatement): string {
-  return `${support.version_added}`;
+  return `${support.version_added}${support.partial_implementation ? ' [partial]' : ''}`;
 }
 
 interface PlatformInfo {
@@ -165,9 +165,16 @@ async function applyTestResults(
     const prevSummary = isDryRun ? summarizeSupport(currentSupport) : '';
 
     if (currentSupport.version_added === null) {
-      currentSupport.version_added = result.ok
-        ? `<${result.env.version}`
-        : false;
+      currentSupport.version_added =
+        result.ok || result.partial ? `<${result.env.version}` : false;
+      if (result.partial) {
+        currentSupport.partial_implementation = true;
+        if (!result.notes?.length) {
+          throw new Error(
+            `Partial implementation of ${node.__compat.description} in ${result.env.id} without notes`,
+          );
+        }
+      }
     } else if (currentSupport.version_added === false) {
       currentSupport.version_added = result.ok ? result.env.version : false;
     } else if (currentSupport.version_added === true) {
@@ -178,7 +185,7 @@ async function applyTestResults(
     } else if (typeof currentSupport.version_added === 'string') {
       const currentRange = new Range(currentSupport.version_added);
       const isInRange = currentRange.test(result.env.version);
-      if (isInRange) {
+      if (isInRange && currentSupport.version_added !== result.env.version) {
         currentSupport.version_added = `<${result.env.version}`;
       }
     }

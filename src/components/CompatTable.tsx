@@ -15,8 +15,10 @@ export interface PlatformType {
   children: Platform[];
 }
 
-export interface SupportHistoryEntry {
-  version_added: string | boolean | null;
+interface SupportHistoryEntry {
+  version_added: string | null | boolean;
+  version_removed?: string | null | boolean;
+  partial_implementation?: boolean;
   notes?: string | string[];
 }
 
@@ -141,7 +143,7 @@ export function CompatTable({ platforms, compats }: CompatTableProps) {
                   {formatVersionAdded(entry)}
                   <ul>
                     {notes.map((note) => (
-                      <li>{note}</li>
+                      <li dangerouslySetInnerHTML={{ __html: note }}></li>
                     ))}
                   </ul>
                 </li>
@@ -183,7 +185,9 @@ export function CompatTable({ platforms, compats }: CompatTableProps) {
                 <button
                   class={
                     support.version_added
-                      ? styles['support-supported']
+                      ? support.partial_implementation
+                        ? styles['support-partial']
+                        : styles['support-supported']
                       : styles['support-unsupported']
                   }
                 >

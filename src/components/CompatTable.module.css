@@ -151,6 +151,15 @@ table.compat-table {
     }
   }
 
+  .support-partial {
+    color: var(--text-primary-yellow);
+
+    & > .icon-support {
+      --icon__image: var(--icon-partial);
+      --icon__color: var(--text-primary-yellow);
+    }
+  }
+
   .platform-logo {
     margin-bottom: 0.3rem;
   }

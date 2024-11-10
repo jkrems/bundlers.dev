@@ -1,12 +1,12 @@
-test('import.meta.url is a string', () => {
+test('<code>import.meta.url</code> is a string', () => {
   expect(typeof import.meta.url).toBe('string');
 });
 
-test('NOTE: import.meta.url has file:// protocol', async () => {
+test('NOTE: <code>import.meta.url</code> has <code>file://</code> protocol', async () => {
   expect(new URL(import.meta.url).protocol).toBe('file:');
 });
 
-test('NOTE: Can fetch() the result of import.meta.url', async () => {
+test('NOTE/FAIL: Cannot <code>fetch()</code> the result of <code>import.meta.url</code>', async () => {
   const textFileUrl = new URL('./testdata/file.txt', import.meta.url).href;
   expect(typeof textFileUrl).toBe('string');
   const contents = await fetch(textFileUrl).then((resp) => resp.text());

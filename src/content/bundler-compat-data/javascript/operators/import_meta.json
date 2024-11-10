@@ -46,53 +46,49 @@
             "description": "<code>import.meta.url</code>",
             "support": {
               "vite": {
-                "version_added": "1.0.0",
-                "notes": [
-                  "Can fetch() the result of import.meta.url"
-                ]
+                "version_added": "1.0.0"
               },
               "webpack": {
                 "version_added": "5.0.0",
                 "notes": [
-                  "import.meta.url has file:// protocol",
-                  "Can fetch() the result of import.meta.url"
+                  "<code>import.meta.url</code> has <code>file://</code> protocol"
                 ]
               },
               "nodejs": {
                 "version_added": "<23.1.0",
                 "notes": [
-                  "import.meta.url has file:// protocol"
+                  "<code>import.meta.url</code> has <code>file://</code> protocol",
+                  "Cannot <code>fetch()</code> the result of <code>import.meta.url</code>"
                 ]
               },
               "bun": {
                 "version_added": "<1.1.29",
                 "notes": [
-                  "import.meta.url has file:// protocol",
-                  "Can fetch() the result of import.meta.url"
+                  "<code>import.meta.url</code> has <code>file://</code> protocol"
                 ]
               },
               "deno": {
                 "version_added": "<1.46.3",
                 "notes": [
-                  "import.meta.url has file:// protocol",
-                  "Can fetch() the result of import.meta.url"
+                  "<code>import.meta.url</code> has <code>file://</code> protocol"
                 ]
               },
               "esbuild": {
-                "version_added": false
+                "version_added": false,
+                "notes": [
+                  "Cannot <code>fetch()</code> the result of <code>import.meta.url</code>"
+                ]
               },
               "rspack": {
                 "version_added": "<1.1.0",
                 "notes": [
-                  "import.meta.url has file:// protocol",
-                  "Can fetch() the result of import.meta.url"
+                  "<code>import.meta.url</code> has <code>file://</code> protocol"
                 ]
               },
               "rsbuild": {
                 "version_added": "<1.1.0",
                 "notes": [
-                  "import.meta.url has file:// protocol",
-                  "Can fetch() the result of import.meta.url"
+                  "<code>import.meta.url</code> has <code>file://</code> protocol"
                 ]
               }
             },
@@ -115,8 +111,10 @@
                 },
                 "nodejs": {
                   "version_added": "<23.1.0",
+                  "partial_implementation": true,
                   "notes": [
-                    "Using the node:worker_threads API"
+                    "Using the <code>node:worker_threads</code> API",
+                    "Fails: <code>import.meta.url</code> can load a <code>Worker</code>"
                   ]
                 },
                 "bun": {
@@ -158,10 +156,40 @@
                 }
               ],
               "vite": {
-                "version_added": false
+                "version_added": "5.4.10",
+                "notes": [
+                  "Cannot <code>fetch()</code> the result of <code>import.meta.resolve</code>"
+                ]
               },
               "webpack": {
-                "version_added": false
+                "version_added": false,
+                "notes": [
+                  "Cannot <code>fetch()</code> the result of <code>import.meta.resolve</code>"
+                ]
+              },
+              "bun": {
+                "version_added": "<1.1.29"
+              },
+              "deno": {
+                "version_added": "<1.46.3"
+              },
+              "esbuild": {
+                "version_added": false,
+                "notes": [
+                  "Cannot <code>fetch()</code> the result of <code>import.meta.resolve</code>"
+                ]
+              },
+              "rsbuild": {
+                "version_added": false,
+                "notes": [
+                  "Cannot <code>fetch()</code> the result of <code>import.meta.resolve</code>"
+                ]
+              },
+              "rspack": {
+                "version_added": false,
+                "notes": [
+                  "Cannot <code>fetch()</code> the result of <code>import.meta.resolve</code>"
+                ]
               }
             },
             "status": {

@@ -1,4 +1,4 @@
-test('import.meta.url can load a Worker', async () => {
+test('<code>import.meta.url</code> can load a <code>Worker</code>', async () => {
   const worker = new Worker(new URL('./testdata/worker.js', import.meta.url), {
     type: 'module',
   });

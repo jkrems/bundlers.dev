@@ -1,4 +1,6 @@
-test('NOTE: Using the node:worker_threads API', async () => {
+import './url.web_worker.test.js';
+
+test('NOTE: Using the <code>node:worker_threads</code> API', async () => {
   const { Worker } = await import('node:worker_threads');
   const worker = new Worker(
     new URL('./testdata/worker~nodejs.js', import.meta.url),

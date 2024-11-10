@@ -1,0 +1,17 @@
+test('<code>import.meta.resolve</code> is a function', () => {
+  expect(typeof import.meta.resolve).toBe('function');
+});
+
+test('Returns an string', async () => {
+  expect(typeof import.meta.resolve('./testdata/worker.js')).toBe('string');
+});
+
+test('NOTE: Returns a <code>URL</code> object instead of a string', async () => {
+  expect(import.meta.resolve('./testdata/worker.js') instanceof URL).toBe(true);
+});
+
+test('NOTE/FAIL: Cannot <code>fetch()</code> the result of <code>import.meta.resolve</code>', async () => {
+  const textFileUrl = import.meta.resolve('./testdata/file.txt');
+  const contents = await fetch(textFileUrl).then((resp) => resp.text());
+  expect(contents).toBe('~~ok~~\n');
+});
