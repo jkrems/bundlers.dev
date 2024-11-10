@@ -177,6 +177,10 @@ async function applyTestResults(
       }
     } else if (currentSupport.version_added === false) {
       currentSupport.version_added = result.ok ? result.env.version : false;
+      if (result.partial) {
+        currentSupport.version_added = result.env.version;
+        currentSupport.partial_implementation = true;
+      }
     } else if (currentSupport.version_added === true) {
       currentSupport.version_added = `<${result.env.version}`;
       if (!result.ok) {

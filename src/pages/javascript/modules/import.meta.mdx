@@ -34,11 +34,12 @@ For authoring code, bundlers may provide the following properties:
   <dt><code>env</code> <ExperimentalInline /></dt>
   <dd>Object that contains custom environment settings, e.g. those read from <code>.env</code> files.</dd>
 
-  <dt><code>env.DEV</code> <ExperimentalInline /></dt>
-  <dd>A boolean that specifies if development-time debug assertions should be enabled, e.g. because the code is running in an interactive development environment.</dd>
-
-  <dt><code>env.PROD</code> <ExperimentalInline /></dt>
-  <dd>A boolean that specifies if development-time debug assertions should be disabled, e.g. because the code is being built for a minified & optimized production environment. Should be equal to `!env.DEV` if both exist.</dd>
+  <dt><code>env.DEV</code> and <code>env.PROD</code> <ExperimentalInline /></dt>
+  <dd>
+    <code>env.DEV</code> is a boolean that specifies if development-time debug assertions should be enabled,
+    e.g. because the code is running in an interactive development environment.
+    It's opposite is <code>env.PROD</code> which should always be equal to <code>!env.DEV</code>.
+  </dd>
 
   <dt><code>env.MODE</code> <ExperimentalInline /></dt>
   <dd>A string description for a "bundling mode". May include any user-defined string.</dd>
@@ -46,12 +47,6 @@ For authoring code, bundlers may provide the following properties:
   <dt><code>env.SSR</code> <ExperimentalInline /></dt>
   <dd>A boolean that is true if the code is running as part of SSR (server-side rendering).</dd>
 
-  <dt><code>webpack</code> <ExperimentalInline /></dt>
-  <dd>The version of webpack used to bundle the code.</dd>
-
-  <dt><code>webpackHot</code> <ExperimentalInline /></dt>
-  <dd>Webpack's hot module replacement API that is available during development.</dd>
-
-  <dt><code>webpackContext</code> <ExperimentalInline /></dt>
-  <dd>Webpack-specific metadata about the current file.</dd>
+  <dt><code>webpack</code>, <code>webpackHot</code>, and <code>webpackContext</code> <ExperimentalInline /></dt>
+  <dd>The major version of webpack used to bundle, webpack's hot module replacement API for this module, and contextual information about how this module was included in the current webpack build.</dd>
 </dl>

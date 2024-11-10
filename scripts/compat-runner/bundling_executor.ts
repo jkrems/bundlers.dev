@@ -75,7 +75,14 @@ export abstract class BundlingTestCaseExecutor extends TestCaseExecutor {
 (function() {
 const tests = new Map();
 
+let ranTests = false;
+
 async function runTests() {
+  if (ranTests) {
+    return;
+  }
+  ranTests = true;
+
   for (const [description, fn] of tests) {
     let error = null;
     try {
@@ -96,11 +103,18 @@ Object.assign(globalThis, {
     if (tests.has(description)) {
       throw new Error(\`Duplicate test with description: \${description}\`);
     }
+    if (ranTests) {
+      throw new Error(\`Non-synchronous test registration for \${description}\`);
+    }
     tests.set(description, fn);
 
     queueMicrotask(runTests);
   },
 });
+
+setTimeout(() => {
+  if (!ranTests) runTests();
+}, 150);
 })();
 </script>
 <script src="/${pageContext.id}${pageContext.mainUrl}"${pageContext.mainIsModule ? ' type="module"' : ''}></script>`);

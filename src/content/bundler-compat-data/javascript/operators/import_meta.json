@@ -207,6 +207,77 @@
                 "version_added": "1.0.0"
               },
               "webpack": {
+                "version_added": "5.96.1",
+                "partial_implementation": true,
+                "notes": [
+                  "Fails: <code>import&#8288;.meta.env</code> is an object",
+                  "Fails: <code>import&#8288;.meta.env</code> allows dot access",
+                  "Fails: <code>import&#8288;.meta.env</code> allows bracket access",
+                  "Fails: <code>import&#8288;.meta.env.{DEV,PROD}</code> are mutually exclusive",
+                  "Fails: <code>import&#8288;.meta.env.DEV</code> is a boolean",
+                  "Fails: <code>import&#8288;.meta.env.PROD</code> is a boolean",
+                  "Fails: <code>import&#8288;.meta.env.MODE</code> is a string"
+                ]
+              },
+              "bun": {
+                "version_added": "<1.1.29",
+                "partial_implementation": true,
+                "notes": [
+                  "Fails: <code>import&#8288;.meta.env.{DEV,PROD}</code> are mutually exclusive",
+                  "Fails: <code>import&#8288;.meta.env.DEV</code> is a boolean",
+                  "Fails: <code>import&#8288;.meta.env.PROD</code> is a boolean",
+                  "Fails: <code>import&#8288;.meta.env.MODE</code> is a string"
+                ]
+              },
+              "deno": {
+                "version_added": "<1.46.3",
+                "partial_implementation": true,
+                "notes": [
+                  "Fails: <code>import&#8288;.meta.env</code> is an object",
+                  "Fails: <code>import&#8288;.meta.env</code> allows dot access",
+                  "Fails: <code>import&#8288;.meta.env</code> allows bracket access",
+                  "Fails: <code>import&#8288;.meta.env.{DEV,PROD}</code> are mutually exclusive",
+                  "Fails: <code>import&#8288;.meta.env.DEV</code> is a boolean",
+                  "Fails: <code>import&#8288;.meta.env.PROD</code> is a boolean",
+                  "Fails: <code>import&#8288;.meta.env.MODE</code> is a string"
+                ]
+              },
+              "esbuild": {
+                "version_added": "<0.24.0",
+                "partial_implementation": true,
+                "notes": [
+                  "Fails: <code>import&#8288;.meta.env</code> is an object",
+                  "Fails: <code>import&#8288;.meta.env</code> allows dot access",
+                  "Fails: <code>import&#8288;.meta.env</code> allows bracket access",
+                  "Fails: <code>import&#8288;.meta.env.{DEV,PROD}</code> are mutually exclusive",
+                  "Fails: <code>import&#8288;.meta.env.DEV</code> is a boolean",
+                  "Fails: <code>import&#8288;.meta.env.PROD</code> is a boolean",
+                  "Fails: <code>import&#8288;.meta.env.MODE</code> is a string"
+                ]
+              },
+              "nodejs": {
+                "version_added": "<23.1.0",
+                "partial_implementation": true,
+                "notes": [
+                  "Fails: <code>import&#8288;.meta.env</code> is an object",
+                  "Fails: <code>import&#8288;.meta.env</code> allows dot access",
+                  "Fails: <code>import&#8288;.meta.env</code> allows bracket access",
+                  "Fails: <code>import&#8288;.meta.env.{DEV,PROD}</code> are mutually exclusive",
+                  "Fails: <code>import&#8288;.meta.env.DEV</code> is a boolean",
+                  "Fails: <code>import&#8288;.meta.env.PROD</code> is a boolean",
+                  "Fails: <code>import&#8288;.meta.env.MODE</code> is a string"
+                ]
+              },
+              "rsbuild": {
+                "version_added": "<1.1.0",
+                "partial_implementation": true,
+                "notes": [
+                  "Fails: <code>import&#8288;.meta.env</code> is an object",
+                  "Fails: <code>import&#8288;.meta.env</code> allows dot access",
+                  "Fails: <code>import&#8288;.meta.env</code> allows bracket access"
+                ]
+              },
+              "rspack": {
                 "version_added": false
               }
             },
@@ -226,6 +297,24 @@
               },
               "webpack": {
                 "version_added": false
+              },
+              "bun": {
+                "version_added": false
+              },
+              "deno": {
+                "version_added": false
+              },
+              "esbuild": {
+                "version_added": false
+              },
+              "nodejs": {
+                "version_added": false
+              },
+              "rsbuild": {
+                "version_added": false
+              },
+              "rspack": {
+                "version_added": false
               }
             },
             "status": {
@@ -237,49 +326,38 @@
         },
         "webpack": {
           "__compat": {
-            "description": "<code>import&#8288;.meta.webpack</code>",
+            "description": "<code>import&#8288;.meta.webpack*</code>",
             "support": {
               "vite": {
                 "version_added": false
               },
-              "webpack": {
-                "version_added": "5.0.0"
-              }
-            },
-            "status": {
-              "experimental": true,
-              "standard_track": false,
-              "deprecated": false
-            }
-          }
-        },
-        "webpack_context": {
-          "__compat": {
-            "description": "<code>import&#8288;.meta.webpackContext</code>",
-            "support": {
-              "vite": {
+              "webpack": [
+                {
+                  "version_added": "5.70.0"
+                },
+                {
+                  "version_added": "5.0.0",
+                  "partial_implementation": true,
+                  "notes": "<code>webpackContext</code> was not available in the initial release."
+                }
+              ],
+              "bun": {
                 "version_added": false
               },
-              "webpack": {
-                "version_added": "5.70.0"
-              }
-            },
-            "status": {
-              "experimental": true,
-              "standard_track": false,
-              "deprecated": false
-            }
-          }
-        },
-        "webpack_hot": {
-          "__compat": {
-            "description": "<code>import&#8288;.meta.webpackHot</code>",
-            "support": {
-              "vite": {
+              "deno": {
                 "version_added": false
               },
-              "webpack": {
-                "version_added": "5.0.0"
+              "esbuild": {
+                "version_added": false
+              },
+              "nodejs": {
+                "version_added": false
+              },
+              "rsbuild": {
+                "version_added": "<1.1.0"
+              },
+              "rspack": {
+                "version_added": "<1.1.0"
               }
             },
             "status": {
