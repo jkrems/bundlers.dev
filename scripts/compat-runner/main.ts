@@ -1,5 +1,6 @@
 import { glob, readFile, writeFile, stat } from 'node:fs/promises';
 import { join } from 'node:path';
+import { compare, Range } from 'semver';
 
 import { BunTestCaseExecutor } from './bun/executor.ts';
 import { DenoTestCaseExecutor } from './deno/executor.ts';
@@ -173,6 +174,12 @@ async function applyTestResults(
       currentSupport.version_added = `<${result.env.version}`;
       if (!result.ok) {
         currentSupport.version_removed = result.env.version;
+      }
+    } else if (typeof currentSupport.version_added === 'string') {
+      const currentRange = new Range(currentSupport.version_added);
+      const isInRange = currentRange.test(result.env.version);
+      if (isInRange) {
+        currentSupport.version_added = `<${result.env.version}`;
       }
     }
 

@@ -29,7 +29,7 @@
               "version_added": "<0.24.0"
             },
             "rspack": {
-              "version_added": "<5.75.0"
+              "version_added": "<1.1.0"
             },
             "rsbuild": {
               "version_added": "<1.1.0"
@@ -47,7 +47,9 @@
             "support": {
               "vite": {
                 "version_added": "1.0.0",
-                "notes": ["Can fetch() the result of import.meta.url"]
+                "notes": [
+                  "Can fetch() the result of import.meta.url"
+                ]
               },
               "webpack": {
                 "version_added": "5.0.0",
@@ -58,7 +60,9 @@
               },
               "nodejs": {
                 "version_added": "<23.1.0",
-                "notes": ["import.meta.url has file:// protocol"]
+                "notes": [
+                  "import.meta.url has file:// protocol"
+                ]
               },
               "bun": {
                 "version_added": "<1.1.29",
@@ -78,7 +82,7 @@
                 "version_added": false
               },
               "rspack": {
-                "version_added": "<5.75.0",
+                "version_added": "<1.1.0",
                 "notes": [
                   "import.meta.url has file:// protocol",
                   "Can fetch() the result of import.meta.url"
@@ -111,7 +115,9 @@
                 },
                 "nodejs": {
                   "version_added": "<23.1.0",
-                  "notes": ["Using the node:worker_threads API"]
+                  "notes": [
+                    "Using the node:worker_threads API"
+                  ]
                 },
                 "bun": {
                   "version_added": "<1.1.29"
@@ -123,7 +129,7 @@
                   "version_added": false
                 },
                 "rspack": {
-                  "version_added": "<5.75.0"
+                  "version_added": "<1.1.0"
                 },
                 "rsbuild": {
                   "version_added": "1.1.0"

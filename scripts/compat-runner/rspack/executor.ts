@@ -17,7 +17,7 @@ export class RspackTestCaseExecutor extends BundlingTestCaseExecutor {
   protected override async getEnvInfo(): Promise<EnvInfo> {
     return {
       id: 'rspack',
-      version: rspack.version,
+      version: rspack.rspackVersion,
     };
   }
 
