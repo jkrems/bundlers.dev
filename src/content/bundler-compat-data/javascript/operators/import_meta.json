@@ -47,9 +47,7 @@
             "support": {
               "vite": {
                 "version_added": "1.0.0",
-                "notes": [
-                  "Can fetch() the result of import.meta.url"
-                ]
+                "notes": ["Can fetch() the result of import.meta.url"]
               },
               "webpack": {
                 "version_added": "5.0.0",
@@ -60,9 +58,7 @@
               },
               "nodejs": {
                 "version_added": "<23.1.0",
-                "notes": [
-                  "import.meta.url has file:// protocol"
-                ]
+                "notes": ["import.meta.url has file:// protocol"]
               },
               "bun": {
                 "version_added": "<1.1.29",
@@ -115,9 +111,7 @@
                 },
                 "nodejs": {
                   "version_added": "<23.1.0",
-                  "notes": [
-                    "Using the node:worker_threads API"
-                  ]
+                  "notes": ["Using the node:worker_threads API"]
                 },
                 "bun": {
                   "version_added": "<1.1.29"
@@ -147,6 +141,16 @@
           "__compat": {
             "description": "<code>import&#8288;.meta.resolve</code>",
             "support": {
+              "nodejs": [
+                {
+                  "version_added": "20.8.0"
+                },
+                {
+                  "version_added": "20.6.0",
+                  "partial_implementation": true,
+                  "notes": "Returns an URL object instead of a string."
+                }
+              ],
               "vite": {
                 "version_added": false
               },
