@@ -27,6 +27,9 @@
             },
             "esbuild": {
               "version_added": "<0.24.0"
+            },
+            "rspack": {
+              "version_added": "<5.75.0"
             }
           },
           "status": {
@@ -74,6 +77,13 @@
               },
               "esbuild": {
                 "version_added": false
+              },
+              "rspack": {
+                "version_added": "<5.75.0",
+                "notes": [
+                  "import.meta.url has file:// protocol",
+                  "Can fetch() the result of import.meta.url"
+                ]
               }
             },
             "status": {
@@ -107,6 +117,9 @@
                 },
                 "esbuild": {
                   "version_added": false
+                },
+                "rspack": {
+                  "version_added": "<5.75.0"
                 }
               },
               "status": {
