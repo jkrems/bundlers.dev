@@ -112,9 +112,7 @@ Object.assign(globalThis, {
   },
 });
 
-setTimeout(() => {
-  if (!ranTests) runTests();
-}, 150);
+setTimeout(runTests, 150);
 })();
 </script>
 <script src="/${pageContext.id}${pageContext.mainUrl}"${pageContext.mainIsModule ? ' type="module"' : ''}></script>`);

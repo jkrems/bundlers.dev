@@ -36,8 +36,10 @@ Object.assign(globalThis, {
       throw new Error(`Non-synchronous test registration for ${description}`);
     }
     tests.set(description, fn);
+
+    queueMicrotask(runTests);
   },
   expect,
 });
 
-queueMicrotask(runTests);
+setTimeout(runTests, 250);

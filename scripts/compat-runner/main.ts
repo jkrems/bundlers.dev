@@ -187,10 +187,19 @@ async function applyTestResults(
         currentSupport.version_removed = result.env.version;
       }
     } else if (typeof currentSupport.version_added === 'string') {
-      const currentRange = new Range(currentSupport.version_added);
-      const isInRange = currentRange.test(result.env.version);
-      if (isInRange && currentSupport.version_added !== result.env.version) {
-        currentSupport.version_added = `<${result.env.version}`;
+      if (
+        result.ok ||
+        !!result.partial === !!currentSupport.partial_implementation
+      ) {
+        const currentRange = new Range(currentSupport.version_added);
+        const isInRange = currentRange.test(result.env.version);
+        if (isInRange && currentSupport.version_added !== result.env.version) {
+          currentSupport.version_added = `<${result.env.version}`;
+        }
+      } else if (!result.ok && !result.partial) {
+        throw new Error(
+          `Implement: version_removed for '${node.__compat.description}'`,
+        );
       }
     }
 

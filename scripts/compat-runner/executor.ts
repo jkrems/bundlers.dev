@@ -40,7 +40,7 @@ export abstract class TestCaseExecutor {
 
 function parseSubPath(base: string): string[] {
   // Remove ~env suffix first.
-  base = base.replace(/~\w+$/, '');
+  base = base.replace(/(?:~\w+)+$/, '');
   if (base === '_') return [];
   return base.split('.');
 }
@@ -81,15 +81,20 @@ export function toTestSuiteResult(
   const compatGroup = dirname(relative('compat-suite', filename));
   const compatSubpath = parseSubPath(basename(filename, '.test.js'));
   const partial = total > 0 && fail > 0 && pass > 0;
+  if (partial) {
+    for (const failureNote of failureNotes) {
+      notes.add(`Fails: ${failureNote}`);
+    }
+  }
+  if (partial && !notes.size) {
+    throw new Error(`Cannot generate partial success without notes`);
+  }
   return {
     env,
     filename,
     compatGroup,
     compatSubpath,
-    notes: [
-      ...notes,
-      ...(partial ? failureNotes.map((n) => `Fails: ${n}`) : []),
-    ],
+    notes: [...notes],
     ok: total > 0 && fail === 0,
     partial,
     pass,
