@@ -30,6 +30,9 @@
             },
             "rspack": {
               "version_added": "<5.75.0"
+            },
+            "rsbuild": {
+              "version_added": "<1.1.0"
             }
           },
           "status": {
@@ -84,6 +87,13 @@
                   "import.meta.url has file:// protocol",
                   "Can fetch() the result of import.meta.url"
                 ]
+              },
+              "rsbuild": {
+                "version_added": "<1.1.0",
+                "notes": [
+                  "import.meta.url has file:// protocol",
+                  "Can fetch() the result of import.meta.url"
+                ]
               }
             },
             "status": {
@@ -120,6 +130,9 @@
                 },
                 "rspack": {
                   "version_added": "<5.75.0"
+                },
+                "rsbuild": {
+                  "version_added": "1.1.0"
                 }
               },
               "status": {

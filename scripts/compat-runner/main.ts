@@ -9,6 +9,7 @@ import type { TestCaseExecutor, TestSuiteResult } from './executor.ts';
 import { WebpackTestCaseExecutor } from './webpack/executor.ts';
 import { ViteTestCaseExecutor } from './vite/executor.ts';
 import { RspackTestCaseExecutor } from './rspack/executor.ts';
+import { RsbuildTestCaseExecutor } from './rsbuild/executor.ts';
 
 async function getTestSuites(
   globs: string[],
@@ -98,6 +99,10 @@ const PLATFORMS = new Map<string, PlatformInfo>([
   [
     'nodejs',
     { id: 'nodejs', type: 'runtime', Executor: NodejsTestCaseExecutor },
+  ],
+  [
+    'rsbuild',
+    { id: 'rsbuild', type: 'bundler', Executor: RsbuildTestCaseExecutor },
   ],
   [
     'rspack',
