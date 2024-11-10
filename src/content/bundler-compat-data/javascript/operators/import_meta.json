@@ -148,7 +148,7 @@
                 {
                   "version_added": "20.6.0",
                   "partial_implementation": true,
-                  "notes": "Returns an URL object instead of a string."
+                  "notes": "Returns a URL object instead of a string."
                 }
               ],
               "vite": {
