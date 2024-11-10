@@ -1,6 +1,6 @@
 import { glob, readFile, writeFile, stat } from 'node:fs/promises';
 import { join } from 'node:path';
-import { compare, Range } from 'semver';
+import { Range } from 'semver';
 
 import { BunTestCaseExecutor } from './bun/executor.ts';
 import { DenoTestCaseExecutor } from './deno/executor.ts';

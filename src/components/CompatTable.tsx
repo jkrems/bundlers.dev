@@ -3,47 +3,31 @@ import { useCallback, useMemo } from 'preact/hooks';
 
 import styles from './CompatTable.module.css';
 import ExperimentalInline from './ExperimentalInline.tsx';
+import {
+  type Platform,
+  type PlatformId,
+  type PlatformType,
+  type PlatformTypeObj,
+  type SupportHistoryEntry,
+  type SupportStatement,
+  type Compat,
+} from '../../scripts/compat-runner/compat_data_schema.ts';
 
-export interface Platform {
-  id: string;
-  name: string;
+export interface PlatformGroup extends PlatformTypeObj<PlatformType> {
+  children: Platform<PlatformId>[];
 }
 
-export interface PlatformType {
-  id: 'bundler' | 'runtime';
-  name: string;
-  children: Platform[];
-}
-
-interface SupportHistoryEntry {
-  version_added: string | null | boolean;
-  version_removed?: string | null | boolean;
-  partial_implementation?: boolean;
-  notes?: string | string[];
-}
-
-export type SupportStatement = SupportHistoryEntry | SupportHistoryEntry[];
-
-export interface CompatEntry {
+interface CompatEntry extends Compat {
   level: number;
-  description: string;
-  support: {
-    [name: string]: SupportStatement;
-  };
-  status: {
-    experimental: boolean;
-    standard_track: boolean;
-    deprecated: boolean;
-  };
 }
 
 export interface CompatTableProps {
-  platforms: PlatformType[];
+  platforms: PlatformGroup[];
   compats: CompatEntry[];
 }
 
 function normalizeSupport(
-  support: SupportStatement | null,
+  support: SupportStatement | undefined,
 ): SupportHistoryEntry[] {
   if (!support || (Array.isArray(support) && support.length === 0)) {
     return [
@@ -98,7 +82,7 @@ export function CompatTable({ platforms, compats }: CompatTableProps) {
     (e: MouseEvent) => {
       const el = e.currentTarget as HTMLTableCellElement;
       const compatIndex = Number(el.dataset['compatIndex']);
-      const platformId = String(el.dataset['platformId']);
+      const platformId = String(el.dataset['platformId']) as PlatformId;
       const compat = compats[compatIndex];
 
       const support = normalizeSupport(compat.support[platformId]);

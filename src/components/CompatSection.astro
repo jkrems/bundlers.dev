@@ -1,98 +1,42 @@
 ---
-import { CompatTable, type PlatformType } from './CompatTable.tsx';
+import { CompatTable, type PlatformGroup } from './CompatTable.tsx';
+import {
+  isCompatNode,
+  PLATFORMS,
+  PLATFORM_TYPES,
+  type CompatJson,
+  type Compat,
+} from '../../scripts/compat-runner/compat_data_schema.ts';
 
-const PLATFORMS: PlatformType[] = [
-  {
-    id: 'bundler',
-    name: 'Bundlers',
-    children: [
-      {
-        id: 'esbuild',
-        name: 'esbuild',
-      },
-      {
-        id: 'rsbuild',
-        name: 'Rsbuild',
-      },
-      {
-        id: 'rspack',
-        name: 'Rspack',
-      },
-      {
-        id: 'vite',
-        name: 'Vite',
-      },
-      {
-        id: 'webpack',
-        name: 'Webpack',
-      },
-    ],
-  },
-  {
-    id: 'runtime',
-    name: 'Runtimes',
-    children: [
-      {
-        id: 'bun',
-        name: 'Bun',
-      },
-      {
-        id: 'deno',
-        name: 'Deno',
-      },
-      {
-        id: 'nodejs',
-        name: 'Node.js',
-      },
-    ],
-  },
-];
+const PLATFORM_GROUPS: PlatformGroup[] = Object.values(PLATFORM_TYPES).map(
+  (pt) => ({
+    ...pt,
+    children: Object.values(PLATFORMS).filter((p) => p.type === pt.id),
+  }),
+);
 
-interface SupportStatement {
-  version_added: string | boolean | null;
-  notes?: string | string[];
-}
-
-interface CompatEntry {
+interface CompatEntry extends Compat {
   level: number;
-  description: string;
-  support: {
-    [name: string]: SupportStatement;
-  };
-  status: {
-    experimental: boolean;
-    standard_track: boolean;
-    deprecated: boolean;
-  };
 }
 
-function collectCompat(feature: object, level: number): CompatEntry[] {
+function collectCompat(feature: CompatJson, level: number): CompatEntry[] {
   const result: CompatEntry[] = [];
 
+  if (isCompatNode(feature)) {
+    result.push({ ...feature.__compat, level });
+  }
+
   for (const [key, value] of Object.entries(feature)) {
-    if (key === '__compat') {
-      result.push({ ...value, level });
-    } else {
-      result.push(...collectCompat(value as object, level + 1));
+    if (key !== '__compat' && !!value) {
+      result.push(...collectCompat(value, level + 1));
     }
   }
 
   return result;
 }
 
-function formatVersionAdded(support: SupportStatement): string | null {
-  if (!support.version_added) {
-    return 'No';
-  }
-  if (support.version_added === true) {
-    return 'Yes';
-  }
-  const pretty = support.version_added.replace(/(?:\.0)+$/, '');
-  return pretty;
-}
-
 const compats = collectCompat(Astro.props.feature, 0);
 ---
 
 <h2>Bundler compatibility</h2>
-<CompatTable platforms={PLATFORMS} compats={compats} client:idle />
+<CompatTable platforms={PLATFORM_GROUPS} compats={compats} client:idle />
