@@ -19,7 +19,7 @@ export interface PlatformInfo<T extends PlatformId> extends Platform<T> {
 }
 
 export interface TestSuiteResult<T extends PlatformId> {
-  env: PlatformInfo<T>;
+  platform: PlatformInfo<T>;
   filename: string;
   compatGroup: string;
   compatSubpath: string[];
@@ -91,7 +91,7 @@ export function toTestSuiteResult<T extends PlatformId>(
     throw new Error(`Cannot generate partial success without notes`);
   }
   return {
-    env: platform,
+    platform: platform,
     filename,
     compatGroup,
     compatSubpath,

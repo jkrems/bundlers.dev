@@ -13,6 +13,7 @@ import { ViteTestCaseExecutor } from './vite/executor.ts';
 import { RspackTestCaseExecutor } from './rspack/executor.ts';
 import { RsbuildTestCaseExecutor } from './rsbuild/executor.ts';
 import { PLATFORMS, type PlatformId } from './compat_data_schema.ts';
+import { CompatData, CompatDataDiskSource } from './compat_data.ts';
 
 async function getTestSuites(
   globs: string[],
@@ -142,35 +143,37 @@ async function applyTestResults(
     }
     assertCompatNode(node, result.filename);
 
-    if (!node.__compat.support[result.env.id]) {
-      node.__compat.support[result.env.id] = {
+    if (!node.__compat.support[result.platform.id]) {
+      node.__compat.support[result.platform.id] = {
         version_added: null,
       };
     }
-    const currentSupport = node.__compat.support[result.env.id];
+    const currentSupport = node.__compat.support[result.platform.id];
     const prevSummary = isDryRun ? summarizeSupport(currentSupport) : '';
 
     if (currentSupport.version_added === null) {
       currentSupport.version_added =
-        result.ok || result.partial ? `<${result.env.version}` : false;
+        result.ok || result.partial ? `<${result.platform.version}` : false;
       if (result.partial) {
         currentSupport.partial_implementation = true;
         if (!result.notes?.length) {
           throw new Error(
-            `Partial implementation of ${node.__compat.description} in ${result.env.id} without notes`,
+            `Partial implementation of ${node.__compat.description} in ${result.platform.id} without notes`,
           );
         }
       }
     } else if (currentSupport.version_added === false) {
-      currentSupport.version_added = result.ok ? result.env.version : false;
+      currentSupport.version_added = result.ok
+        ? result.platform.version
+        : false;
       if (result.partial) {
-        currentSupport.version_added = result.env.version;
+        currentSupport.version_added = result.platform.version;
         currentSupport.partial_implementation = true;
       }
     } else if (currentSupport.version_added === true) {
-      currentSupport.version_added = `<${result.env.version}`;
+      currentSupport.version_added = `<${result.platform.version}`;
       if (!result.ok) {
-        currentSupport.version_removed = result.env.version;
+        currentSupport.version_removed = result.platform.version;
       }
     } else if (typeof currentSupport.version_added === 'string') {
       if (
@@ -178,9 +181,12 @@ async function applyTestResults(
         !!result.partial === !!currentSupport.partial_implementation
       ) {
         const currentRange = new Range(currentSupport.version_added);
-        const isInRange = currentRange.test(result.env.version);
-        if (isInRange && currentSupport.version_added !== result.env.version) {
-          currentSupport.version_added = `<${result.env.version}`;
+        const isInRange = currentRange.test(result.platform.version);
+        if (
+          isInRange &&
+          currentSupport.version_added !== result.platform.version
+        ) {
+          currentSupport.version_added = `<${result.platform.version}`;
         }
       } else if (!result.ok && !result.partial) {
         throw new Error(
@@ -275,6 +281,18 @@ async function main(argv: string[]) {
       runForPlatformId(platformId, globs, { cwd }),
     ),
   );
+
+  const compatData = new CompatData(
+    new CompatDataDiskSource({
+      rootDir: join(cwd, 'src/content/bundler-compat-data'),
+    }),
+  );
+
+  for (const results of resultsByPlatform) {
+    for (const result of results.values()) {
+      compatData.applyTestResult(result);
+    }
+  }
 
   for (const results of resultsByPlatform) {
     await applyTestResults(results, { cwd, isDryRun });
