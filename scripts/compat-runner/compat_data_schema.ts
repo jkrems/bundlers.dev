@@ -90,11 +90,22 @@ export const PLATFORMS: Platforms = {
   },
 };
 
+export interface SupportFlag {
+  type: 'preference' | 'runtime_flag';
+  name: string;
+  value_to_set: string;
+}
+
 export interface SupportHistoryEntry {
   version_added: string | null | boolean;
   version_removed?: string | null | boolean;
+  version_last?: string;
   partial_implementation?: boolean;
   notes?: string | string[];
+
+  alternative_name?: string;
+  prefix?: string;
+  flags?: SupportFlag[];
 }
 
 export type SupportStatement = SupportHistoryEntry | SupportHistoryEntry[];
