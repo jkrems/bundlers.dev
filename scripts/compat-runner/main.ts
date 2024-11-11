@@ -1,6 +1,5 @@
-import { glob, readFile, writeFile, stat } from 'node:fs/promises';
+import { glob, stat } from 'node:fs/promises';
 import { join } from 'node:path';
-import { Range } from 'semver';
 import { parseArgs } from 'node:util';
 
 import { BunTestCaseExecutor } from './bun/executor.ts';
@@ -45,48 +44,6 @@ async function getTestSuites(
   return suites;
 }
 
-function findRootNode(filename: string, compatData: object) {
-  while (!('__compat' in compatData)) {
-    const keys = Object.keys(compatData);
-    if (keys.length !== 1) {
-      throw new Error(
-        'Expected unambiguous root in compat data file ' + filename,
-      );
-    }
-    compatData = (compatData as any)[keys[0]];
-  }
-  return compatData;
-}
-
-interface SupportStatement {
-  version_added: string | null | boolean;
-  version_removed?: string | null | boolean;
-  partial_implementation?: boolean;
-  notes?: string | string[];
-}
-
-interface CompatNode {
-  __compat: {
-    description: string;
-    support: {
-      [id: string]: SupportStatement;
-    };
-  };
-}
-
-function assertCompatNode(
-  node: unknown,
-  filename: string,
-): asserts node is CompatNode {
-  if (!node || typeof node !== 'object' || !('__compat' in node)) {
-    throw new Error('Expect __compat node for ' + filename);
-  }
-}
-
-function summarizeSupport(support: SupportStatement): string {
-  return `${support.version_added}${support.partial_implementation ? ' [partial]' : ''}`;
-}
-
 const EXECUTORS: {
   [K in PlatformId]: { new (): TestCaseExecutor<K> };
 } = {
@@ -125,93 +82,6 @@ async function runForPlatformId(
   const results = await executor.run(testSuites, process.cwd());
 
   return results;
-}
-
-async function applyTestResults(
-  results: Map<string, TestSuiteResult<PlatformId>>,
-  { cwd, isDryRun }: { cwd: string; isDryRun: boolean },
-) {
-  for (const result of results.values()) {
-    const compatDataPath = join(
-      cwd,
-      `src/content/bundler-compat-data/${result.compatGroup}.json`,
-    );
-    const compatData = JSON.parse(await readFile(compatDataPath, 'utf8'));
-    let node = findRootNode(compatDataPath, compatData);
-    for (const subPath of result.compatSubpath) {
-      node = (node as any)[subPath];
-    }
-    assertCompatNode(node, result.filename);
-
-    if (!node.__compat.support[result.platform.id]) {
-      node.__compat.support[result.platform.id] = {
-        version_added: null,
-      };
-    }
-    const currentSupport = node.__compat.support[result.platform.id];
-    const prevSummary = isDryRun ? summarizeSupport(currentSupport) : '';
-
-    if (currentSupport.version_added === null) {
-      currentSupport.version_added =
-        result.ok || result.partial ? `<${result.platform.version}` : false;
-      if (result.partial) {
-        currentSupport.partial_implementation = true;
-        if (!result.notes?.length) {
-          throw new Error(
-            `Partial implementation of ${node.__compat.description} in ${result.platform.id} without notes`,
-          );
-        }
-      }
-    } else if (currentSupport.version_added === false) {
-      currentSupport.version_added = result.ok
-        ? result.platform.version
-        : false;
-      if (result.partial) {
-        currentSupport.version_added = result.platform.version;
-        currentSupport.partial_implementation = true;
-      }
-    } else if (currentSupport.version_added === true) {
-      currentSupport.version_added = `<${result.platform.version}`;
-      if (!result.ok) {
-        currentSupport.version_removed = result.platform.version;
-      }
-    } else if (typeof currentSupport.version_added === 'string') {
-      if (
-        result.ok ||
-        !!result.partial === !!currentSupport.partial_implementation
-      ) {
-        const currentRange = new Range(currentSupport.version_added);
-        const isInRange = currentRange.test(result.platform.version);
-        if (
-          isInRange &&
-          currentSupport.version_added !== result.platform.version
-        ) {
-          currentSupport.version_added = `<${result.platform.version}`;
-        }
-      } else if (!result.ok && !result.partial) {
-        throw new Error(
-          `Implement: version_removed for '${node.__compat.description}'`,
-        );
-      }
-    }
-
-    currentSupport.notes = result.notes.length ? result.notes : undefined;
-    const newSummary = isDryRun ? summarizeSupport(currentSupport) : '';
-
-    if (isDryRun && newSummary !== prevSummary) {
-      console.log(
-        '%s: %s -> %s',
-        node.__compat.description,
-        prevSummary,
-        newSummary,
-      );
-    } else {
-      await writeFile(
-        compatDataPath,
-        JSON.stringify(compatData, null, 2) + '\n',
-      );
-    }
-  }
 }
 
 const DEFAULT_PLATFORM_IDS: PlatformId[] = ['nodejs'];

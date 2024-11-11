@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs';
+import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { SemVer } from 'semver';
+import { format } from 'prettier';
 
 import {
   assertCompatNode,
@@ -86,7 +88,13 @@ export class CompatDataDiskSource implements CompatDataSource {
   }
 
   async save(groupName: string, json: CompatJson): Promise<void> {
-    console.log('save', groupName);
+    const filepath = join(this.rootDir, `${groupName}.json`);
+    const rawText = JSON.stringify(json);
+    const prettyText = await format(rawText, {
+      parser: 'json',
+      filepath,
+    });
+    await writeFile(filepath, prettyText);
   }
 }
 
