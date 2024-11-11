@@ -12,9 +12,9 @@
           "support": {
             "vite": { "version_added": "1.0.0" },
             "webpack": { "version_added": "5.0.0" },
-            "nodejs": { "version_added": "23.1.0" },
+            "nodejs": { "version_added": "18.19.0" },
             "bun": { "version_added": "1.1.0" },
-            "deno": { "version_added": "1.46.3" },
+            "deno": { "version_added": "1.46.0" },
             "esbuild": { "version_added": "0.24.0" },
             "rspack": { "version_added": "1.1.0" },
             "rsbuild": { "version_added": "1.1.0" }
@@ -37,7 +37,7 @@
                 ]
               },
               "nodejs": {
-                "version_added": "23.1.0",
+                "version_added": "18.19.0",
                 "notes": [
                   "<code>import.meta.url</code> has <code>file://</code> protocol",
                   "Cannot <code>fetch()</code> the result of <code>import.meta.url</code>"
@@ -50,7 +50,7 @@
                 ]
               },
               "deno": {
-                "version_added": "1.46.3",
+                "version_added": "1.46.0",
                 "notes": [
                   "<code>import.meta.url</code> has <code>file://</code> protocol"
                 ]
@@ -88,7 +88,7 @@
                 "vite": { "version_added": "1.0.0" },
                 "webpack": { "version_added": "5.0.0" },
                 "nodejs": {
-                  "version_added": "23.1.0",
+                  "version_added": "18.19.0",
                   "notes": [
                     "Using the <code>node:worker_threads</code> API",
                     "Fails: <code>import.meta.url</code> can load a <code>Worker</code>"
@@ -96,7 +96,7 @@
                   "partial_implementation": true
                 },
                 "bun": { "version_added": "1.1.0" },
-                "deno": { "version_added": "1.46.3" },
+                "deno": { "version_added": "1.46.0" },
                 "esbuild": { "version_added": false },
                 "rspack": { "version_added": "1.1.0" },
                 "rsbuild": { "version_added": "1.1.0" }
@@ -113,20 +113,12 @@
           "__compat": {
             "description": "<code>import&#8288;.meta.resolve</code>",
             "support": {
-              "nodejs": [
-                {
-                  "version_added": "20.8.0",
-                  "notes": [
-                    "Cannot <code>fetch()</code> the result of <code>import.meta.resolve</code>"
-                  ]
-                },
-                {
-                  "version_added": "20.6.0",
-                  "version_removed": "20.8.0",
-                  "notes": ["Returns a URL object instead of a string."],
-                  "partial_implementation": true
-                }
-              ],
+              "nodejs": {
+                "version_added": "18.19.0",
+                "notes": [
+                  "Cannot <code>fetch()</code> the result of <code>import.meta.resolve</code>"
+                ]
+              },
               "vite": {
                 "version_added": "5.4.10",
                 "notes": [
@@ -140,7 +132,7 @@
                 ]
               },
               "bun": { "version_added": "1.1.0" },
-              "deno": { "version_added": "1.46.3" },
+              "deno": { "version_added": "1.46.0" },
               "esbuild": {
                 "version_added": false,
                 "notes": [
@@ -209,8 +201,8 @@
                 "vite": { "version_added": "5.4.10" },
                 "webpack": { "version_added": "5.96.1" },
                 "bun": { "version_added": "1.1.0" },
-                "deno": { "version_added": "1.46.3" },
-                "nodejs": { "version_added": "23.1.0" },
+                "deno": { "version_added": "1.46.0" },
+                "nodejs": { "version_added": "18.19.0" },
                 "rspack": { "version_added": false }
               },
               "status": {

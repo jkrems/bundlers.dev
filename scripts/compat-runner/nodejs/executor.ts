@@ -14,8 +14,7 @@ export class NodejsTestCaseExecutor extends ExecTestCaseExecutor<'nodejs'> {
   protected getExecFlags(): string[] {
     return [
       '--no-warnings',
-      '--experimental-strip-types',
-      `--import=${import.meta.resolve('./test-setup.ts')}`,
+      `--import=${import.meta.resolve('./test-setup.js')}`,
     ];
   }
 

@@ -1,8 +1,11 @@
 import { expect } from 'expect';
 
-type TestFunction = () => void | Promise<void>;
+/**
+ * @typedef {() => void | Promise<void>} TestFunction
+ */
 
-const tests = new Map<string, TestFunction>();
+/** @type {Map<string, TestFunction>} */
+const tests = new Map();
 
 let ranTests = false;
 
@@ -28,7 +31,11 @@ async function runTests() {
 }
 
 Object.assign(globalThis, {
-  test: async (description: string, fn: () => Promise<void>) => {
+  /**
+   * @param {string} description
+   * @param {TestFunction} fn
+   */
+  test: async (description, fn) => {
     if (tests.has(description)) {
       throw new Error(`Duplicate test with description: ${description}`);
     }

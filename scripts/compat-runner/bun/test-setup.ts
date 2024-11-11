@@ -1,1 +1,1 @@
-import '../nodejs/test-setup.ts';
+import '../nodejs/test-setup.js';

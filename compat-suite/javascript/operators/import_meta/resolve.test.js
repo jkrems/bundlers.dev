@@ -15,3 +15,7 @@ test('NOTE/FAIL: Cannot <code>fetch()</code> the result of <code>import.meta.res
   const contents = await fetch(textFileUrl).then((resp) => resp.text());
   expect(contents).toBe('~~ok~~\n');
 });
+
+test('NOTE/FAIL: Throws when resolved URL cannot be reached', async () => {
+  expect(() => import.meta.resolve('./testdata/not_a_file.txt')).not.toThrow();
+});
