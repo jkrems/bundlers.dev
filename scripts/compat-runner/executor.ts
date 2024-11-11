@@ -1,6 +1,6 @@
 import { execFile as execFileCb } from 'node:child_process';
 import { promisify } from 'node:util';
-import { relative, dirname, basename } from 'node:path';
+import { relative, dirname, basename, join } from 'node:path';
 
 import type { Platform, PlatformId } from './compat_data_schema';
 
@@ -36,8 +36,7 @@ export interface TestSuiteResult<T extends PlatformId> {
 export abstract class TestCaseExecutor<T extends PlatformId> {
   abstract run(
     filenames: string[],
-    cwd: string,
-    isDebug: boolean,
+    options: ExecutorOptions,
   ): Promise<Map<string, TestSuiteResult<T>>>;
 }
 
@@ -108,6 +107,12 @@ export function toTestSuiteResult<T extends PlatformId>(
   };
 }
 
+export interface ExecutorOptions {
+  cwd: string;
+  isDebug: boolean;
+  overrideVersion: string | null;
+}
+
 export abstract class ExecTestCaseExecutor<
   T extends PlatformId,
 > extends TestCaseExecutor<T> {
@@ -115,13 +120,38 @@ export abstract class ExecTestCaseExecutor<
   protected abstract getExecFlags(): string[];
   protected abstract getPlatformInfo(): Promise<PlatformInfo<T>>;
 
-  async #runTestCase(filename: string, cwd: string): Promise<TestResult[]> {
+  async #runTestCase(
+    filename: string,
+    { cwd, overrideVersion }: ExecutorOptions,
+  ): Promise<TestResult[]> {
     try {
-      const execPath = this.getExecPath();
-      const execFlags = [...this.getExecFlags(), filename];
-      console.info('Running: %s %s', execPath, execFlags.join(' '));
+      let execPath = this.getExecPath();
+      let execFlags = [...this.getExecFlags(), filename];
+      let env = { ...process.env };
+      let cmdPrefix = '';
+      if (overrideVersion) {
+        // PROTO_AUTO_INSTALL=true ~/.proto/bin/proto --config-mode=local run <runtime> <version> -- [...args]
+        env.PROTO_AUTO_INSTALL = 'true';
+        cmdPrefix = 'PROTO_AUTO_INSTALL=true ';
+        execFlags = [
+          '--config-mode=local',
+          'run',
+          execPath,
+          overrideVersion,
+          '--',
+          ...execFlags,
+        ];
+        execPath = join(process.env.HOME!, '.proto/bin/proto');
+      }
+      console.info(
+        'Running: %s%s %s',
+        cmdPrefix,
+        execPath,
+        execFlags.join(' '),
+      );
       const { stdout, stderr } = await execFile(execPath, execFlags, {
         cwd,
+        env,
       });
       if (stderr) {
         console.error('While running %s:\n  %s', filename, stderr);
@@ -145,17 +175,19 @@ export abstract class ExecTestCaseExecutor<
 
   async run(
     filenames: string[],
-    cwd: string,
-    isDebug: boolean,
+    options: ExecutorOptions,
   ): Promise<Map<string, TestSuiteResult<T>>> {
+    const { isDebug, overrideVersion } = options;
     if (isDebug) {
       throw new Error(`--debug is not supported for this platform yet`);
     }
     const env = await this.getPlatformInfo();
-
+    if (overrideVersion) {
+      env.version = overrideVersion;
+    }
     const suites = new Map<string, TestSuiteResult<T>>();
     for (const filename of filenames) {
-      const results = await this.#runTestCase(filename, cwd);
+      const results = await this.#runTestCase(filename, options);
       suites.set(filename, toTestSuiteResult(env, filename, results));
     }
     return suites;

@@ -14,6 +14,7 @@ import {
   type TestSuiteResult,
   toTestSuiteResult,
   type PlatformInfo,
+  type ExecutorOptions,
 } from './executor.ts';
 import type { PlatformId } from './compat_data_schema.ts';
 
@@ -213,9 +214,12 @@ setTimeout(runTests, 150);
 
   async run(
     filenames: string[],
-    cwd: string,
-    isDebug: boolean,
+    { cwd, isDebug, overrideVersion }: ExecutorOptions,
   ): Promise<Map<string, TestSuiteResult<T>>> {
+    if (overrideVersion) {
+      throw new Error(`Overriding the version is not implemented yet`);
+    }
+
     if (isDebug) {
       const [filename] = filenames;
       const pageContext = this.createPageContext();

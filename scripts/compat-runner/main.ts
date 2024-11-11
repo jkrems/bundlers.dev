@@ -6,7 +6,11 @@ import { BunTestCaseExecutor } from './bun/executor.ts';
 import { DenoTestCaseExecutor } from './deno/executor.ts';
 import { NodejsTestCaseExecutor } from './nodejs/executor.ts';
 import { EsbuildTestCaseExecutor } from './esbuild/executor.ts';
-import type { TestCaseExecutor, TestSuiteResult } from './executor.ts';
+import type {
+  ExecutorOptions,
+  TestCaseExecutor,
+  TestSuiteResult,
+} from './executor.ts';
 import { WebpackTestCaseExecutor } from './webpack/executor.ts';
 import { ViteTestCaseExecutor } from './vite/executor.ts';
 import { RspackTestCaseExecutor } from './rspack/executor.ts';
@@ -70,25 +74,23 @@ function createExecutor(platformId: PlatformId) {
 async function runForPlatformId(
   platformId: PlatformId,
   globs: string[],
-  { cwd, isDebug }: { cwd: string; isDebug: boolean },
+  options: ExecutorOptions,
 ): Promise<Map<string, TestSuiteResult<PlatformId>>> {
   const executor = createExecutor(platformId);
 
   const testSuites = await getTestSuites(globs, {
-    cwd,
+    cwd: options.cwd,
     platformId,
   });
 
-  if (isDebug && testSuites.length > 1) {
+  if (options.isDebug && testSuites.length > 1) {
     throw new Error(`Cannot use --debug with more than one test suite at once`);
   }
 
-  const results = await executor.run(testSuites, cwd, isDebug);
+  const results = await executor.run(testSuites, options);
 
   return results;
 }
-
-const DEFAULT_PLATFORM_IDS: PlatformId[] = ['nodejs'];
 
 function castPlatformId(id: string): PlatformId {
   if (PLATFORMS.hasOwnProperty(id)) {
@@ -97,29 +99,36 @@ function castPlatformId(id: string): PlatformId {
   throw new Error(`Unrecognized platform id '${id}'`);
 }
 
-function parsePlatformFilter(platformFilter: string[]): PlatformId[] {
+type PlatformSpec = [PlatformId, string | null];
+
+const DEFAULT_PLATFORM_SPECS: PlatformSpec[] = [['nodejs', null]];
+
+function parsePlatformFilter(platformFilter: string[]): PlatformSpec[] {
   if (platformFilter.length === 0) {
-    return DEFAULT_PLATFORM_IDS;
+    return DEFAULT_PLATFORM_SPECS;
   }
 
-  return Array.from(
-    new Set(
-      platformFilter.flatMap((filter) => {
-        const allPlatforms: PlatformId[] = Array.from(
-          Object.values(PLATFORMS),
-          (p) => p.id,
-        );
-        if (filter === '*') {
-          return allPlatforms;
-        } else if (filter === 'bundler' || filter === 'runtime') {
-          return allPlatforms.filter((id: PlatformId) => {
-            return PLATFORMS[id].type === filter;
-          });
-        }
-        return filter.split(',').map(castPlatformId);
-      }),
-    ),
+  const allPlatforms: PlatformId[] = Array.from(
+    Object.values(PLATFORMS),
+    (p) => p.id,
   );
+
+  const specStrings: string[] = platformFilter.flatMap((filter) => {
+    if (filter === '*') {
+      return allPlatforms;
+    } else if (filter === 'bundler' || filter === 'runtime') {
+      return allPlatforms.filter((id: PlatformId) => {
+        return PLATFORMS[id].type === filter;
+      });
+    }
+    return filter.split(',');
+  });
+
+  const platformSpecs: PlatformSpec[] = specStrings.map((spec) => {
+    const [id, version = null] = spec.split('@');
+    return [castPlatformId(id), version];
+  });
+  return platformSpecs;
 }
 
 async function main(argv: string[]) {
@@ -150,13 +159,17 @@ async function main(argv: string[]) {
     throw new Error('Expected test file patterns');
   }
 
-  const platformIds = parsePlatformFilter(platformFilter);
+  const platformSpecs = parsePlatformFilter(platformFilter);
 
   const cwd = process.cwd();
 
   const resultsByPlatform = await Promise.all(
-    platformIds.map((platformId) =>
-      runForPlatformId(platformId, globs, { cwd, isDebug }),
+    platformSpecs.map(([platformId, overrideVersion]) =>
+      runForPlatformId(platformId, globs, {
+        cwd,
+        isDebug,
+        overrideVersion,
+      }),
     ),
   );
 

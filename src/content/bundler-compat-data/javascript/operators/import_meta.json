@@ -13,7 +13,7 @@
             "vite": { "version_added": "1.0.0" },
             "webpack": { "version_added": "5.0.0" },
             "nodejs": { "version_added": "23.1.0" },
-            "bun": { "version_added": "1.1.29" },
+            "bun": { "version_added": "1.1.0" },
             "deno": { "version_added": "1.46.3" },
             "esbuild": { "version_added": "0.24.0" },
             "rspack": { "version_added": "1.1.0" },
@@ -44,7 +44,7 @@
                 ]
               },
               "bun": {
-                "version_added": "1.1.29",
+                "version_added": "1.1.0",
                 "notes": [
                   "<code>import.meta.url</code> has <code>file://</code> protocol"
                 ]
@@ -95,7 +95,7 @@
                   ],
                   "partial_implementation": true
                 },
-                "bun": { "version_added": "1.1.29" },
+                "bun": { "version_added": "1.1.0" },
                 "deno": { "version_added": "1.46.3" },
                 "esbuild": { "version_added": false },
                 "rspack": { "version_added": "1.1.0" },
@@ -139,7 +139,7 @@
                   "Cannot <code>fetch()</code> the result of <code>import.meta.resolve</code>"
                 ]
               },
-              "bun": { "version_added": "1.1.29" },
+              "bun": { "version_added": "1.1.0" },
               "deno": { "version_added": "1.46.3" },
               "esbuild": {
                 "version_added": false,
@@ -174,7 +174,7 @@
               "vite": { "version_added": "1.0.0" },
               "webpack": { "version_added": false },
               "bun": {
-                "version_added": "1.1.29",
+                "version_added": "1.1.0",
                 "notes": [
                   "Fails: <code>import&#8288;.meta.env.{DEV,PROD}</code> exist and are mutually exclusive",
                   "Fails: <code>import&#8288;.meta.env.MODE</code> is a string"
@@ -208,7 +208,7 @@
                 "rsbuild": { "version_added": "1.1.0" },
                 "vite": { "version_added": "5.4.10" },
                 "webpack": { "version_added": "5.96.1" },
-                "bun": { "version_added": "1.1.29" },
+                "bun": { "version_added": "1.1.0" },
                 "deno": { "version_added": "1.46.3" },
                 "nodejs": { "version_added": "23.1.0" },
                 "rspack": { "version_added": false }
