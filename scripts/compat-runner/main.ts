@@ -286,6 +286,7 @@ async function main(argv: string[]) {
     new CompatDataDiskSource({
       rootDir: join(cwd, 'src/content/bundler-compat-data'),
     }),
+    isDryRun,
   );
 
   for (const results of resultsByPlatform) {
@@ -294,8 +295,12 @@ async function main(argv: string[]) {
     }
   }
 
-  for (const results of resultsByPlatform) {
-    await applyTestResults(results, { cwd, isDryRun });
+  if (isDryRun) {
+    for (const change of compatData.changes()) {
+      console.log(change);
+    }
+  } else {
+    await compatData.save();
   }
 }
 

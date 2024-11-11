@@ -47,31 +47,46 @@ export class CompatGroup {
 
     return node.__compat;
   }
+
+  getSupportHistory(
+    subpath: string[],
+    platformId: PlatformId,
+  ): NormalizedSupportHistory {
+    const compat = this.getCompat(subpath);
+    if (!(compat.support[platformId] instanceof NormalizedSupportHistory)) {
+      const history = new NormalizedSupportHistory(compat.support[platformId]);
+      compat.support[platformId] = history as unknown as SupportStatement;
+      return history;
+    }
+    return compat.support[platformId];
+  }
+
+  toJSON() {
+    return this.rootNode;
+  }
 }
 
 export interface CompatDataSource {
-  getGroup(groupName: string): CompatGroup;
+  readGroupData(groupName: string): CompatJson;
+  save(groupName: string, json: CompatJson): Promise<void>;
 }
 
 export class CompatDataDiskSource implements CompatDataSource {
   private readonly rootDir;
-  private readonly cache = new Map<string, CompatGroup>();
 
   constructor({ rootDir }: { rootDir: string }) {
     this.rootDir = rootDir;
   }
 
-  getGroup(groupName: string): CompatGroup {
-    let group: CompatGroup | undefined = this.cache.get(groupName);
-    if (group) {
-      return group;
-    }
+  readGroupData(groupName: string): CompatJson {
     const json = JSON.parse(
       readFileSync(join(this.rootDir, `${groupName}.json`), 'utf8'),
     ) as CompatJson;
-    group = new CompatGroup(groupName, json);
-    this.cache.set(groupName, group);
-    return group;
+    return json;
+  }
+
+  async save(groupName: string, json: CompatJson): Promise<void> {
+    console.log('save', groupName);
   }
 }
 
@@ -103,10 +118,9 @@ function unpackFlags(flags: undefined | SupportFlag[]): SupportFlag[] {
 }
 
 export class NormalizedSupportHistory {
-  private readonly history: NormalizedSupportHistoryEntry[];
+  private history: NormalizedSupportHistoryEntry[];
 
-  constructor(compat: Compat, platformId: PlatformId) {
-    let existing = compat.support[platformId];
+  constructor(existing?: SupportStatement) {
     if (existing) {
       if (!Array.isArray(existing)) {
         existing = [existing];
@@ -146,7 +160,7 @@ export class NormalizedSupportHistory {
           const version =
             entry.version_added === true
               ? lastEntry.version.inc('patch')
-              : new SemVer(entry.version_added);
+              : new SemVer(entry.version_added.replace(/^</, ''));
           if (lastEntry.version.version === version.version) {
             if (lastEntry.notes.length) {
               throw new Error('Cannot preserve notes when merging versions');
@@ -192,7 +206,52 @@ export class NormalizedSupportHistory {
   }
 
   mergeTestResult(result: TestSuiteResult<PlatformId>) {
-    throw new Error('TODO');
+    const newEntry: NormalizedSupportHistoryEntry = {
+      version: new SemVer(result.platform.version),
+      status: result.partial ? 'partial' : result.ok ? 'full' : 'none',
+      notes: result.notes,
+      flags: [],
+    };
+
+    const smallerIdx = this.history.findIndex(
+      (e) => e.version.compare(result.platform.version) <= 0,
+    );
+    const smallerEntry = this.history[smallerIdx];
+    if (newEntry.version.compare(smallerEntry.version) === 0) {
+      this.history = [
+        ...this.history.slice(0, smallerIdx),
+        newEntry,
+        ...this.history.slice(smallerIdx + 1),
+      ];
+    } else {
+      if (newEntry.status === smallerEntry.status) {
+        this.history = [
+          ...this.history.slice(0, smallerIdx),
+          {
+            ...newEntry,
+            version: smallerEntry.version,
+          },
+          ...this.history.slice(smallerIdx + 1),
+        ];
+      } else {
+        const nextEntry: NormalizedSupportHistoryEntry | undefined =
+          this.history[smallerIdx - 1];
+        if (nextEntry?.status === newEntry.status) {
+          // Expand the next entry to include this earlier version.
+          this.history = [
+            ...this.history.slice(0, smallerIdx - 1),
+            newEntry,
+            ...this.history.slice(smallerIdx),
+          ];
+        } else {
+          this.history = [
+            ...this.history.slice(0, smallerIdx),
+            newEntry,
+            ...this.history.slice(smallerIdx),
+          ];
+        }
+      }
+    }
   }
 
   toString(): string {
@@ -267,22 +326,67 @@ export class NormalizedSupportHistory {
   }
 }
 
+interface CompatDataChange {
+  platformId: PlatformId;
+  compatGroup: string;
+  compatSubpath: string[];
+  before: string;
+  after: string;
+}
+
 export class CompatData {
   private readonly source;
+  private readonly cache = new Map<string, CompatGroup>();
+  private readonly collectedChanges: CompatDataChange[] = [];
+  private readonly collectChanges: boolean;
 
-  constructor(source: CompatDataSource) {
+  constructor(source: CompatDataSource, collectChanges = false) {
     this.source = source;
+    this.collectChanges = collectChanges;
+  }
+
+  private getGroup(groupName: string): CompatGroup {
+    let group: CompatGroup | undefined = this.cache.get(groupName);
+    if (group) {
+      return group;
+    }
+    const json = this.source.readGroupData(groupName);
+    group = new CompatGroup(groupName, json);
+    this.cache.set(groupName, group);
+    return group;
   }
 
   applyTestResult(result: TestSuiteResult<PlatformId>) {
-    const group = this.source.getGroup(result.compatGroup);
-    const compat = group.getCompat(result.compatSubpath);
+    const group = this.getGroup(result.compatGroup);
+    const history = group.getSupportHistory(
+      result.compatSubpath,
+      result.platform.id,
+    );
+    const before = this.collectChanges ? history.toString() : '';
+    history.mergeTestResult(result);
+    const after = this.collectChanges ? history.toString() : '';
+    if (this.collectChanges && before !== after) {
+      this.collectedChanges.push({
+        platformId: result.platform.id,
+        compatGroup: result.compatGroup,
+        compatSubpath: result.compatSubpath,
+        before,
+        after,
+      });
+    }
+  }
 
-    console.log('applyTestResult', result, compat.support[result.platform.id]);
+  async save() {
+    for (const [groupName, compatGroup] of this.cache) {
+      await this.source.save(groupName, compatGroup.toJSON());
+    }
+  }
 
-    // TODO:
-    // 1. Expand current support into [{version: 0.0.0, support: none}, ...].
-    // 2. Merge in new support value.
-    // 3. Create simplification to normal support values.
+  groups(): MapIterator<[string, CompatGroup]> {
+    return this.cache.entries();
+  }
+
+  changes(): Iterable<CompatDataChange> {
+    return this.collectedChanges;
   }
 }

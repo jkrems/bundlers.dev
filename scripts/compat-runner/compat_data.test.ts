@@ -2,33 +2,66 @@ import { describe, it, expect } from 'vitest';
 
 import { NormalizedSupportHistory } from './compat_data.ts';
 import {
-  type Compat,
+  PLATFORMS,
   type PlatformId,
-  type SupportHistoryEntry,
   type SupportStatement,
 } from './compat_data_schema.ts';
+import {
+  toTestSuiteResult,
+  type PlatformInfo,
+  type TestResult,
+  type TestSuiteResult,
+} from './executor.ts';
 
-const PLATFORM_ID: PlatformId = 'bun';
+const PLATFORM = PLATFORMS.bun;
 
-function makeCompat(support?: SupportStatement): Compat {
-  return {
-    description: 'x',
-    support: {
-      bun: support,
-    },
-    status: {
-      standard_track: true,
-      deprecated: false,
-      experimental: false,
-    },
-  };
+interface TestSuiteResultOptions {
+  pass?: number;
+  fail?: number;
+  notes?: number;
+}
+
+function makeTestSuiteResult<T extends PlatformId>(
+  platform: PlatformInfo<T>,
+  options: TestSuiteResultOptions,
+): TestSuiteResult<T> {
+  let { pass = 0, fail = 0, notes = 0 } = options;
+  const results: TestResult[] = [];
+
+  for (let i = 0; i < pass; ++i) {
+    results.push({ description: `Pass ${i}`, error: null });
+  }
+  for (let i = 0; i < fail; ++i) {
+    results.push({
+      description: `Fail ${i}`,
+      error: { message: `Error message ${i}` },
+    });
+  }
+  for (let i = 0; i < notes; ++i) {
+    results.push({
+      description: `NOTE: Note ${i}`,
+      error: null,
+    });
+  }
+
+  const suiteResult = toTestSuiteResult(
+    platform,
+    'some/filename.test.js',
+    results,
+  );
+  expect(suiteResult.pass).toBe(pass + notes);
+  expect(suiteResult.fail).toBe(fail);
+  expect(suiteResult.notes.length).toEqual(notes + (pass && fail ? fail : 0));
+  return suiteResult;
+}
+
+function getCanonical(history: NormalizedSupportHistory): SupportStatement {
+  return JSON.parse(JSON.stringify(history));
 }
 
 describe('NormalizedSupportHistory', () => {
   it('generates empty history entries', () => {
-    expect(
-      new NormalizedSupportHistory(makeCompat(), PLATFORM_ID).toJSON(),
-    ).toEqual({
+    expect(new NormalizedSupportHistory().toJSON()).toEqual({
       version_added: false,
     });
   });
@@ -94,12 +127,9 @@ describe('NormalizedSupportHistory', () => {
     ];
 
     for (const [history, expected] of testCases) {
-      expect(
-        new NormalizedSupportHistory(
-          makeCompat(history),
-          PLATFORM_ID,
-        ).toString(),
-      ).toEqual(expected);
+      expect(new NormalizedSupportHistory(history).toString()).toEqual(
+        expected,
+      );
     }
   });
 
@@ -135,13 +165,81 @@ describe('NormalizedSupportHistory', () => {
     ];
 
     for (const history of histories) {
-      expect(
-        JSON.parse(
-          JSON.stringify(
-            new NormalizedSupportHistory(makeCompat(history), PLATFORM_ID),
-          ),
-        ),
-      ).toEqual(history);
+      expect(getCanonical(new NormalizedSupportHistory(history))).toEqual(
+        history,
+      );
     }
+  });
+
+  it('removes less-than from version', () => {
+    expect(
+      getCanonical(new NormalizedSupportHistory({ version_added: '<1.2.3' })),
+    ).toEqual({ version_added: '1.2.3' });
+  });
+
+  it('tightens support if earlier version is tested', () => {
+    const history = new NormalizedSupportHistory({
+      version_added: '2.1.0',
+    });
+    history.mergeTestResult(
+      makeTestSuiteResult({ ...PLATFORM, version: '2.0.0' }, { pass: 1 }),
+    );
+    expect(history.toString()).toBe('2.0.0: full\n0.0.0: none');
+    expect(getCanonical(history)).toEqual({
+      version_added: '2.0.0',
+    });
+  });
+
+  it('inserts a history entry if support changes', () => {
+    const history = new NormalizedSupportHistory({
+      version_added: '2.1.0',
+    });
+    history.mergeTestResult(
+      makeTestSuiteResult({ ...PLATFORM, version: '2.3.0' }, { fail: 1 }),
+    );
+    expect(history.toString()).toBe('2.3.0: none\n2.1.0: full\n0.0.0: none');
+    expect(getCanonical(history)).toEqual({
+      version_added: '2.1.0',
+      version_removed: '2.3.0',
+    });
+  });
+
+  it('takes notes from new entry', () => {
+    const history = new NormalizedSupportHistory({
+      version_added: '2.1.0',
+      notes: ['a'],
+    });
+    history.mergeTestResult(
+      makeTestSuiteResult(
+        { ...PLATFORM, version: '2.1.0' },
+        { pass: 1, notes: 1 },
+      ),
+    );
+    expect(history.toString()).toBe('2.1.0: full - ["Note 0"]\n0.0.0: none');
+    expect(getCanonical(history)).toEqual({
+      version_added: '2.1.0',
+      notes: ['Note 0'],
+    });
+  });
+
+  it('updates notes from previous version results', () => {
+    const history = new NormalizedSupportHistory({
+      version_added: '2.1.0',
+      partial_implementation: true,
+    });
+    history.mergeTestResult(
+      makeTestSuiteResult(
+        { ...PLATFORM, version: '2.3.0' },
+        { pass: 1, fail: 1 },
+      ),
+    );
+    expect(history.toString()).toBe(
+      '2.1.0: partial - ["Fails: Fail 0"]\n0.0.0: none',
+    );
+    expect(getCanonical(history)).toEqual({
+      version_added: '2.1.0',
+      partial_implementation: true,
+      notes: ['Fails: Fail 0'],
+    });
   });
 });

@@ -24,6 +24,7 @@ export interface TestSuiteResult<T extends PlatformId> {
   compatGroup: string;
   compatSubpath: string[];
   notes: string[];
+  flags: string[];
   ok: boolean;
   partial: boolean;
   pass: number;
@@ -96,6 +97,7 @@ export function toTestSuiteResult<T extends PlatformId>(
     compatGroup,
     compatSubpath,
     notes: [...notes],
+    flags: [],
     ok: total > 0 && fail === 0,
     partial,
     pass,
