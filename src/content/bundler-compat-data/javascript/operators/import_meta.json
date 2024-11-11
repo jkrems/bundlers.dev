@@ -176,9 +176,7 @@
               "bun": {
                 "version_added": "1.1.29",
                 "notes": [
-                  "Fails: <code>import&#8288;.meta.env.{DEV,PROD}</code> are mutually exclusive",
-                  "Fails: <code>import&#8288;.meta.env.DEV</code> is a boolean",
-                  "Fails: <code>import&#8288;.meta.env.PROD</code> is a boolean",
+                  "Fails: <code>import&#8288;.meta.env.{DEV,PROD}</code> exist and are mutually exclusive",
                   "Fails: <code>import&#8288;.meta.env.MODE</code> is a string"
                 ],
                 "partial_implementation": true
@@ -190,8 +188,7 @@
                 "version_added": "1.1.0",
                 "notes": [
                   "Fails: <code>import&#8288;.meta.env</code> is an object",
-                  "Fails: <code>import&#8288;.meta.env</code> allows dot access",
-                  "Fails: <code>import&#8288;.meta.env</code> allows bracket access"
+                  "Fails: <code>import&#8288;.meta.env</code> gracefully handles missing values"
                 ],
                 "partial_implementation": true
               },
