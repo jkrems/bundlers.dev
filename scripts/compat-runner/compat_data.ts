@@ -40,7 +40,9 @@ export class CompatGroup {
     }
     const node = subpath.reduce<CompatJson>((obj: CompatJson, key: string) => {
       if (!obj[key]) {
-        throw new Error(`Could not find ${key}`);
+        throw new Error(
+          `Could not find '${key}' while trying to evaluate subpath '${subpath.join('.')}' in '${this.name}'`,
+        );
       }
       return obj[key];
     }, compatData);

@@ -169,10 +169,7 @@ setTimeout(runTests, 150);
       }
       lines.push(JSON.parse(consoleMessage.text()) as TestResult);
     });
-    const port = await this.#server.then(
-      (s) => (s.address() as AddressInfo).port,
-    );
-    const pageUrl = `http://127.0.0.1:${port}/${pageContext.id}/`;
+    const pageUrl = await this.getPageUrl(pageContext);
     await page.goto(pageUrl);
     await Promise.race([
       allDone,
@@ -195,22 +192,58 @@ setTimeout(runTests, 150);
     return lines;
   }
 
+  private createPageContext() {
+    const pageContext: PageContext = {
+      id: crypto.randomUUID(),
+      files: new Map<string, string>(),
+      mainUrl: '/main.js',
+      mainIsModule: false,
+    };
+    this.#pageContexts.set(pageContext.id, pageContext);
+    return pageContext;
+  }
+
+  private async getPageUrl(pageContext: PageContext) {
+    const port = await this.#server.then(
+      (s) => (s.address() as AddressInfo).port,
+    );
+    const pageUrl = `http://127.0.0.1:${port}/${pageContext.id}/`;
+    return pageUrl;
+  }
+
   async run(
     filenames: string[],
     cwd: string,
+    isDebug: boolean,
   ): Promise<Map<string, TestSuiteResult<T>>> {
+    if (isDebug) {
+      const [filename] = filenames;
+      const pageContext = this.createPageContext();
+      const earlyErrors = await this.setupPageContext(
+        filename,
+        cwd,
+        pageContext,
+      );
+      if (earlyErrors) {
+        console.error(earlyErrors);
+        throw new Error('Bundling failed');
+      }
+      const pageUrl = await this.getPageUrl(pageContext);
+      if (isDebug) {
+        console.log('Open: %s', pageUrl);
+        await new Promise((resolve) => {
+          setTimeout(resolve, 1_000_000);
+        }); // hang
+      }
+      return new Map();
+    }
+
     const browser = await chromium.launch();
     const env = await this.getPlatformInfo();
 
     const suites = new Map<string, TestSuiteResult<T>>();
     for (const filename of filenames) {
-      const pageContext: PageContext = {
-        id: crypto.randomUUID(),
-        files: new Map<string, string>(),
-        mainUrl: '/main.js',
-        mainIsModule: false,
-      };
-      this.#pageContexts.set(pageContext.id, pageContext);
+      const pageContext = this.createPageContext();
       const results = await this.#runTestCase(
         filename,
         cwd,

@@ -172,19 +172,7 @@
             "description": "<code>import&#8288;.meta.env</code>",
             "support": {
               "vite": { "version_added": "1.0.0" },
-              "webpack": {
-                "version_added": "5.96.1",
-                "notes": [
-                  "Fails: <code>import&#8288;.meta.env</code> is an object",
-                  "Fails: <code>import&#8288;.meta.env</code> allows dot access",
-                  "Fails: <code>import&#8288;.meta.env</code> allows bracket access",
-                  "Fails: <code>import&#8288;.meta.env.{DEV,PROD}</code> are mutually exclusive",
-                  "Fails: <code>import&#8288;.meta.env.DEV</code> is a boolean",
-                  "Fails: <code>import&#8288;.meta.env.PROD</code> is a boolean",
-                  "Fails: <code>import&#8288;.meta.env.MODE</code> is a string"
-                ],
-                "partial_implementation": true
-              },
+              "webpack": { "version_added": false },
               "bun": {
                 "version_added": "1.1.29",
                 "notes": [
@@ -195,45 +183,9 @@
                 ],
                 "partial_implementation": true
               },
-              "deno": {
-                "version_added": "1.46.3",
-                "notes": [
-                  "Fails: <code>import&#8288;.meta.env</code> is an object",
-                  "Fails: <code>import&#8288;.meta.env</code> allows dot access",
-                  "Fails: <code>import&#8288;.meta.env</code> allows bracket access",
-                  "Fails: <code>import&#8288;.meta.env.{DEV,PROD}</code> are mutually exclusive",
-                  "Fails: <code>import&#8288;.meta.env.DEV</code> is a boolean",
-                  "Fails: <code>import&#8288;.meta.env.PROD</code> is a boolean",
-                  "Fails: <code>import&#8288;.meta.env.MODE</code> is a string"
-                ],
-                "partial_implementation": true
-              },
-              "esbuild": {
-                "version_added": "0.24.0",
-                "notes": [
-                  "Fails: <code>import&#8288;.meta.env</code> is an object",
-                  "Fails: <code>import&#8288;.meta.env</code> allows dot access",
-                  "Fails: <code>import&#8288;.meta.env</code> allows bracket access",
-                  "Fails: <code>import&#8288;.meta.env.{DEV,PROD}</code> are mutually exclusive",
-                  "Fails: <code>import&#8288;.meta.env.DEV</code> is a boolean",
-                  "Fails: <code>import&#8288;.meta.env.PROD</code> is a boolean",
-                  "Fails: <code>import&#8288;.meta.env.MODE</code> is a string"
-                ],
-                "partial_implementation": true
-              },
-              "nodejs": {
-                "version_added": "23.1.0",
-                "notes": [
-                  "Fails: <code>import&#8288;.meta.env</code> is an object",
-                  "Fails: <code>import&#8288;.meta.env</code> allows dot access",
-                  "Fails: <code>import&#8288;.meta.env</code> allows bracket access",
-                  "Fails: <code>import&#8288;.meta.env.{DEV,PROD}</code> are mutually exclusive",
-                  "Fails: <code>import&#8288;.meta.env.DEV</code> is a boolean",
-                  "Fails: <code>import&#8288;.meta.env.PROD</code> is a boolean",
-                  "Fails: <code>import&#8288;.meta.env.MODE</code> is a string"
-                ],
-                "partial_implementation": true
-              },
+              "deno": { "version_added": false },
+              "esbuild": { "version_added": false },
+              "nodejs": { "version_added": false },
               "rsbuild": {
                 "version_added": "1.1.0",
                 "notes": [
@@ -249,6 +201,26 @@
               "experimental": true,
               "standard_track": false,
               "deprecated": false
+            }
+          },
+          "fallback": {
+            "__compat": {
+              "description": "<code>import&#8288;.meta.env?.X</code>",
+              "support": {
+                "esbuild": { "version_added": "0.24.0" },
+                "rsbuild": { "version_added": "1.1.0" },
+                "vite": { "version_added": "5.4.10" },
+                "webpack": { "version_added": "5.96.1" },
+                "bun": { "version_added": "1.1.29" },
+                "deno": { "version_added": "1.46.3" },
+                "nodejs": { "version_added": "23.1.0" },
+                "rspack": { "version_added": false }
+              },
+              "status": {
+                "experimental": true,
+                "standard_track": false,
+                "deprecated": false
+              }
             }
           }
         },

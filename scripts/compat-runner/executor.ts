@@ -37,6 +37,7 @@ export abstract class TestCaseExecutor<T extends PlatformId> {
   abstract run(
     filenames: string[],
     cwd: string,
+    isDebug: boolean,
   ): Promise<Map<string, TestSuiteResult<T>>>;
 }
 
@@ -145,7 +146,11 @@ export abstract class ExecTestCaseExecutor<
   async run(
     filenames: string[],
     cwd: string,
+    isDebug: boolean,
   ): Promise<Map<string, TestSuiteResult<T>>> {
+    if (isDebug) {
+      throw new Error(`--debug is not supported for this platform yet`);
+    }
     const env = await this.getPlatformInfo();
 
     const suites = new Map<string, TestSuiteResult<T>>();

@@ -70,7 +70,7 @@ function createExecutor(platformId: PlatformId) {
 async function runForPlatformId(
   platformId: PlatformId,
   globs: string[],
-  { cwd }: { cwd: string },
+  { cwd, isDebug }: { cwd: string; isDebug: boolean },
 ): Promise<Map<string, TestSuiteResult<PlatformId>>> {
   const executor = createExecutor(platformId);
 
@@ -79,7 +79,11 @@ async function runForPlatformId(
     platformId,
   });
 
-  const results = await executor.run(testSuites, process.cwd());
+  if (isDebug && testSuites.length > 1) {
+    throw new Error(`Cannot use --debug with more than one test suite at once`);
+  }
+
+  const results = await executor.run(testSuites, cwd, isDebug);
 
   return results;
 }
@@ -120,7 +124,7 @@ function parsePlatformFilter(platformFilter: string[]): PlatformId[] {
 
 async function main(argv: string[]) {
   const {
-    values: { platform: platformFilter, dry: isDryRun },
+    values: { platform: platformFilter, dry: isDryRun, debug: isDebug },
     positionals: globs,
   } = parseArgs({
     args: argv,
@@ -131,6 +135,10 @@ async function main(argv: string[]) {
         default: [],
       },
       dry: {
+        type: 'boolean',
+        default: false,
+      },
+      debug: {
         type: 'boolean',
         default: false,
       },
@@ -148,7 +156,7 @@ async function main(argv: string[]) {
 
   const resultsByPlatform = await Promise.all(
     platformIds.map((platformId) =>
-      runForPlatformId(platformId, globs, { cwd }),
+      runForPlatformId(platformId, globs, { cwd, isDebug }),
     ),
   );
 
