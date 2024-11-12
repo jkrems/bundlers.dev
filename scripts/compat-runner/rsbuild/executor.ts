@@ -13,7 +13,7 @@ export class RsbuildTestCaseExecutor extends BundlingTestCaseExecutor<
   typeof import('@rsbuild/core')
 > {
   protected override async getPlatformInfo(
-    pkg: typeof import('rsbuild'),
+    pkg: typeof import('@rsbuild/core'),
   ): Promise<PlatformInfo<'rsbuild'>> {
     return {
       ...PLATFORMS.rsbuild,

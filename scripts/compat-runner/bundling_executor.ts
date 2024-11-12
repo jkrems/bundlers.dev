@@ -18,6 +18,7 @@ import {
 } from './executor.ts';
 import type { PlatformId } from './compat_data_schema.ts';
 import { getPackageAtVersion } from './package-cache/index.ts';
+import { SemVer } from 'semver';
 
 export interface PageContext {
   id: string;
@@ -43,7 +44,10 @@ export abstract class BundlingTestCaseExecutor<
   T extends PlatformId,
   PackageT,
 > extends TestCaseExecutor<T> {
-  protected abstract getPlatformInfo(pkg: PackageT): Promise<PlatformInfo<T>>;
+  protected abstract getPlatformInfo(
+    pkg: PackageT,
+    versionHint: string | null,
+  ): Promise<PlatformInfo<T>>;
   protected abstract setupPageContext(
     filename: string,
     cwd: string,
@@ -262,7 +266,23 @@ setTimeout(runTests, 150);
     }
 
     const browser = await chromium.launch();
-    const env = await this.getPlatformInfo(pkg);
+    const platform = await this.getPlatformInfo(pkg, overrideVersion);
+    if (
+      !platform.version ||
+      typeof platform.version !== 'string' ||
+      !new SemVer(platform.version)
+    ) {
+      if (overrideVersion) {
+        console.warn(
+          `Gracefully setting version of ${platform.id} to ${overrideVersion}`,
+        );
+        platform.version = overrideVersion;
+      } else {
+        throw new Error(
+          `Invalid version '${platform.version}' returned for ${platform.id}`,
+        );
+      }
+    }
 
     const suites = new Map<string, TestSuiteResult<T>>();
     for (const filename of filenames) {
@@ -274,7 +294,7 @@ setTimeout(runTests, 150);
         browser,
         pageContext,
       );
-      suites.set(filename, toTestSuiteResult(env, filename, results));
+      suites.set(filename, toTestSuiteResult(platform, filename, results));
     }
     await browser.close();
     return suites;
