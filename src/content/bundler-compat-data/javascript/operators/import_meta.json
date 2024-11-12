@@ -13,7 +13,7 @@
             "vite": { "version_added": "1.0.0" },
             "webpack": { "version_added": "5.0.0" },
             "nodejs": { "version_added": "18.19.0" },
-            "bun": { "version_added": "1.1.0" },
+            "bun": { "version_added": "1.0.0" },
             "deno": { "version_added": "1.28.0" },
             "esbuild": { "version_added": "0.18.0" },
             "rspack": { "version_added": "1.1.0" },
@@ -44,7 +44,7 @@
                 ]
               },
               "bun": {
-                "version_added": "1.1.0",
+                "version_added": "1.0.0",
                 "notes": [
                   "<code>import.meta.url</code> has <code>file://</code> protocol"
                 ]
@@ -121,7 +121,18 @@
                 ]
               },
               "webpack": { "version_added": false },
-              "bun": { "version_added": "1.1.0" },
+              "bun": [
+                { "version_added": "1.1.0" },
+                {
+                  "version_added": "1.0.0",
+                  "version_removed": "1.1.0",
+                  "notes": [
+                    "Cannot <code>fetch()</code> the result of <code>import.meta.resolve</code>",
+                    "Fails: Returns an string"
+                  ],
+                  "partial_implementation": true
+                }
+              ],
               "deno": { "version_added": "1.28.0" },
               "esbuild": { "version_added": false },
               "rsbuild": { "version_added": false },
@@ -175,7 +186,7 @@
                 "rsbuild": { "version_added": "1.1.0" },
                 "vite": { "version_added": "5.0.0" },
                 "webpack": { "version_added": "5.0.0" },
-                "bun": { "version_added": "1.1.0" },
+                "bun": { "version_added": "1.0.0" },
                 "deno": { "version_added": "1.28.0" },
                 "nodejs": { "version_added": "18.19.0" },
                 "rspack": { "version_added": false }
