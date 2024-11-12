@@ -18,6 +18,7 @@ import { RspackTestCaseExecutor } from './rspack/executor.ts';
 import { RsbuildTestCaseExecutor } from './rsbuild/executor.ts';
 import { PLATFORMS, type PlatformId } from './compat_data_schema.ts';
 import { CompatData, CompatDataDiskSource } from './compat_data.ts';
+import { ensureExpectBundle } from './expect_bundle.ts';
 
 async function getTestSuites(
   globs: string[],
@@ -163,6 +164,8 @@ async function main(argv: string[]) {
   const platformSpecs = parsePlatformFilter(platformFilter);
 
   const cwd = process.cwd();
+
+  await ensureExpectBundle(cwd);
 
   const resultsByPlatform = await Promise.all(
     platformSpecs.map(([platformId, overrideVersion]) =>

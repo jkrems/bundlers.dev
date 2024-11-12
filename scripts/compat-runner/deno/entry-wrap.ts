@@ -1,4 +1,4 @@
-import { expect } from 'npm:expect';
+import { expect } from '../../../.tmp/expect-bundle.js';
 
 type TestFunction = () => void | Promise<void>;
 

@@ -14,7 +14,7 @@
             "webpack": { "version_added": "5.0.0" },
             "nodejs": { "version_added": "18.19.0" },
             "bun": { "version_added": "1.1.0" },
-            "deno": { "version_added": "1.46.0" },
+            "deno": { "version_added": "1.28.0" },
             "esbuild": { "version_added": "0.24.0" },
             "rspack": { "version_added": "1.1.0" },
             "rsbuild": { "version_added": "1.1.0" }
@@ -50,7 +50,7 @@
                 ]
               },
               "deno": {
-                "version_added": "1.46.0",
+                "version_added": "1.28.0",
                 "notes": [
                   "<code>import.meta.url</code> has <code>file://</code> protocol"
                 ]
@@ -91,7 +91,7 @@
                   "partial_implementation": true
                 },
                 "bun": { "version_added": "1.1.0" },
-                "deno": { "version_added": "1.46.0" },
+                "deno": { "version_added": "1.28.0" },
                 "esbuild": { "version_added": false },
                 "rspack": { "version_added": "1.1.0" },
                 "rsbuild": { "version_added": "1.1.0" }
@@ -122,7 +122,7 @@
               },
               "webpack": { "version_added": false },
               "bun": { "version_added": "1.1.0" },
-              "deno": { "version_added": "1.46.0" },
+              "deno": { "version_added": "1.28.0" },
               "esbuild": { "version_added": false },
               "rsbuild": { "version_added": false },
               "rspack": { "version_added": false }
@@ -176,7 +176,7 @@
                 "vite": { "version_added": "5.0.0" },
                 "webpack": { "version_added": "5.0.0" },
                 "bun": { "version_added": "1.1.0" },
-                "deno": { "version_added": "1.46.0" },
+                "deno": { "version_added": "1.28.0" },
                 "nodejs": { "version_added": "18.19.0" },
                 "rspack": { "version_added": false }
               },

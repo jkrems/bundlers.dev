@@ -15,6 +15,7 @@ export class DenoTestCaseExecutor extends ExecTestCaseExecutor<'deno'> {
     // Deno has no preload scripts so we need to roll our own.
     // If we want data on import.meta.main, that'll be annoying.
     return [
+      'run',
       '--allow-env',
       '--allow-read',
       '--cached-only',
