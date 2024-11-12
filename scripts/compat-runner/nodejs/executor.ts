@@ -12,10 +12,7 @@ export class NodejsTestCaseExecutor extends ExecTestCaseExecutor<'nodejs'> {
   }
 
   protected getExecFlags(): string[] {
-    return [
-      '--no-warnings',
-      `--import=${import.meta.resolve('./test-setup.js')}`,
-    ];
+    return ['--no-warnings', `--require=./.tmp/expect-bundle.cjs`];
   }
 
   protected async getPlatformInfo(): Promise<PlatformInfo<'nodejs'>> {

@@ -6,7 +6,8 @@ import {
 } from 'node:http';
 import { type AddressInfo } from 'node:net';
 import { chromium, type Browser } from 'playwright';
-import { extname } from 'node:path';
+import { extname, join } from 'node:path';
+import { readFileSync } from 'node:fs';
 
 import {
   TestCaseExecutor,
@@ -57,6 +58,8 @@ export abstract class BundlingTestCaseExecutor<
   protected abstract getPackageName(versionHint: string): string;
   protected abstract loadDefaultPackage(): Promise<PackageT>;
 
+  #testScript: string | null = null;
+
   #pageContexts = new Map<string, PageContext>();
 
   #server = new Promise<Server>((resolve) => {
@@ -81,53 +84,12 @@ export abstract class BundlingTestCaseExecutor<
     }
     const subPath = routeMatch[2];
     if (subPath === '/') {
+      if (this.#testScript === null) {
+        this.#testScript = readFileSync('.tmp/expect-bundle.js', 'utf8');
+      }
       res.setHeader('Content-Type', 'text/html');
       res.end(`<!-- TODO: Make this a proper prebundled script? -->
-<script src="https://unpkg.com/expect@24.5.0"></script>
-<script>
-(function() {
-const tests = new Map();
-
-let ranTests = false;
-
-async function runTests() {
-  if (ranTests) {
-    return;
-  }
-  ranTests = true;
-
-  for (const [description, fn] of tests) {
-    let error = null;
-    try {
-      await fn();
-    } catch (e) {
-      error = {
-        message: \`\${e instanceof Error ? e.message : e}\`,
-        stack: e instanceof Error ? e.stack : null,
-      };
-    }
-    console.log(JSON.stringify({ description, error }));
-  }
-  console.log('<done>');
-}
-
-Object.assign(globalThis, {
-  test: async (description, fn) => {
-    if (tests.has(description)) {
-      throw new Error(\`Duplicate test with description: \${description}\`);
-    }
-    if (ranTests) {
-      throw new Error(\`Non-synchronous test registration for \${description}\`);
-    }
-    tests.set(description, fn);
-
-    queueMicrotask(runTests);
-  },
-});
-
-setTimeout(runTests, 150);
-})();
-</script>
+<script>${this.#testScript}</script>
 <script src="/${pageContext.id}${pageContext.mainUrl}"${pageContext.mainIsModule ? ' type="module"' : ''}></script>`);
       return;
     }

@@ -7,7 +7,7 @@ import json from '@rollup/plugin-json';
 import replace from '@rollup/plugin-replace';
 
 export async function ensureExpectBundle(cwd: string) {
-  const expectBundlePath = join(cwd, '.tmp', 'expect-bundle.js');
+  const expectBundlePath = join(cwd, '.tmp', 'expect-bundle.cjs');
   try {
     await stat(expectBundlePath);
     // return;
@@ -28,12 +28,25 @@ export async function ensureExpectBundle(cwd: string) {
       }),
       json(),
       replace({
+        preventAssignment: true,
         'process.env.NODE_ENV': JSON.stringify('production'),
       }),
     ],
   });
   await result.write({
     dir: join(cwd, '.tmp'),
+    format: 'cjs',
+    entryFileNames: 'expect-bundle.cjs',
+  });
+  await result.write({
+    dir: join(cwd, '.tmp'),
     format: 'esm',
+    entryFileNames: 'expect-bundle.mjs',
+  });
+  await result.write({
+    name: 'BundlersDevTest',
+    dir: join(cwd, '.tmp'),
+    format: 'umd',
+    entryFileNames: 'expect-bundle.js',
   });
 }

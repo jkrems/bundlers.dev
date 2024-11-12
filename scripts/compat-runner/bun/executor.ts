@@ -12,7 +12,9 @@ export class BunTestCaseExecutor extends ExecTestCaseExecutor<'bun'> {
   }
 
   protected getExecFlags(): string[] {
-    return [`--preload=${import.meta.resolve('./test-setup.ts')}`];
+    return [
+      `--preload=${import.meta.resolve('../../../.tmp/expect-bundle.cjs')}`,
+    ];
   }
 
   protected async getPlatformInfo(): Promise<PlatformInfo<'bun'>> {
