@@ -1,4 +1,3 @@
-import { createRsbuild, version } from '@rsbuild/core';
 import { join } from 'node:path';
 import { createFsFromVolume, Volume } from 'memfs';
 
@@ -9,21 +8,37 @@ import {
 } from '../bundling_executor.ts';
 import { PLATFORMS } from '../compat_data_schema.ts';
 
-export class RsbuildTestCaseExecutor extends BundlingTestCaseExecutor<'rsbuild'> {
-  protected override async getPlatformInfo(): Promise<PlatformInfo<'rsbuild'>> {
+export class RsbuildTestCaseExecutor extends BundlingTestCaseExecutor<
+  'rsbuild',
+  typeof import('@rsbuild/core')
+> {
+  protected override async getPlatformInfo(
+    pkg: typeof import('rsbuild'),
+  ): Promise<PlatformInfo<'rsbuild'>> {
     return {
       ...PLATFORMS.rsbuild,
-      version,
+      version: pkg.version,
     };
+  }
+
+  protected override getPackageName(): string {
+    return '@rsbuild/core';
+  }
+
+  protected override loadDefaultPackage(): Promise<
+    typeof import('@rsbuild/core')
+  > {
+    return import('@rsbuild/core');
   }
 
   protected override async setupPageContext(
     filename: string,
     cwd: string,
+    pkg: typeof import('@rsbuild/core'),
     pageContext: PageContext,
   ): Promise<TestResult[] | null> {
     const outdir = join(cwd, '.tmp', pageContext.id);
-    const rsbuild = await createRsbuild({
+    const rsbuild = await pkg.createRsbuild({
       cwd: cwd,
       rsbuildConfig: {
         root: cwd,

@@ -1,5 +1,4 @@
 import {
-  default as rspack,
   type Configuration,
   type OutputFileSystem,
   type Stats,
@@ -14,17 +13,33 @@ import {
 } from '../bundling_executor.ts';
 import { PLATFORMS } from '../compat_data_schema.ts';
 
-export class RspackTestCaseExecutor extends BundlingTestCaseExecutor<'rspack'> {
-  protected override async getPlatformInfo(): Promise<PlatformInfo<'rspack'>> {
+export class RspackTestCaseExecutor extends BundlingTestCaseExecutor<
+  'rspack',
+  typeof import('@rspack/core')
+> {
+  protected override async getPlatformInfo(
+    pkg: typeof import('@rspack/core'),
+  ): Promise<PlatformInfo<'rspack'>> {
     return {
       ...PLATFORMS.rspack,
-      version: rspack.rspackVersion,
+      version: pkg.rspackVersion,
     };
+  }
+
+  protected override getPackageName(): string {
+    return '@rspack/core';
+  }
+
+  protected override loadDefaultPackage(): Promise<
+    typeof import('@rspack/core')
+  > {
+    return import('@rspack/core');
   }
 
   protected override async setupPageContext(
     filename: string,
     cwd: string,
+    pkg: typeof import('@rspack/core'),
     pageContext: PageContext,
   ): Promise<TestResult[] | null> {
     let stats: Stats;
@@ -42,7 +57,7 @@ export class RspackTestCaseExecutor extends BundlingTestCaseExecutor<'rspack'> {
           publicPath: `/${pageContext.id}/`,
         },
       };
-      const compiler = rspack(options);
+      const compiler = pkg.rspack(options);
       compiler.outputFileSystem = fs as OutputFileSystem;
 
       stats = await new Promise((resolve, reject) => {

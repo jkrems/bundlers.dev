@@ -40,13 +40,17 @@ function getContentType(filename: string): string {
 
 export abstract class BundlingTestCaseExecutor<
   T extends PlatformId,
+  PackageT,
 > extends TestCaseExecutor<T> {
-  protected abstract getPlatformInfo(): Promise<PlatformInfo<T>>;
+  protected abstract getPlatformInfo(pkg: PackageT): Promise<PlatformInfo<T>>;
   protected abstract setupPageContext(
     filename: string,
     cwd: string,
+    pkg: PackageT,
     pageContext: PageContext,
   ): Promise<TestResult[] | null>;
+  protected abstract getPackageName(versionHint: string): string;
+  protected abstract loadDefaultPackage(): Promise<PackageT>;
 
   #pageContexts = new Map<string, PageContext>();
 
@@ -138,10 +142,16 @@ setTimeout(runTests, 150);
   async #runTestCase(
     filename: string,
     cwd: string,
+    pkg: PackageT,
     browser: Browser,
     pageContext: PageContext,
   ): Promise<TestResult[]> {
-    const earlyErrors = await this.setupPageContext(filename, cwd, pageContext);
+    const earlyErrors = await this.setupPageContext(
+      filename,
+      cwd,
+      pkg,
+      pageContext,
+    );
     if (earlyErrors) {
       return earlyErrors;
     }
@@ -212,6 +222,14 @@ setTimeout(runTests, 150);
     return pageUrl;
   }
 
+  private async getPackage(overrideVersion: string | null): Promise<PackageT> {
+    if (overrideVersion) {
+      throw new Error(`Overriding the version is not implemented yet`);
+    } else {
+      return this.loadDefaultPackage();
+    }
+  }
+
   async run(
     filenames: string[],
     { cwd, isDebug, overrideVersion }: ExecutorOptions,
@@ -219,6 +237,7 @@ setTimeout(runTests, 150);
     if (overrideVersion) {
       throw new Error(`Overriding the version is not implemented yet`);
     }
+    const pkg: PackageT = await this.getPackage(overrideVersion);
 
     if (isDebug) {
       const [filename] = filenames;
@@ -226,6 +245,7 @@ setTimeout(runTests, 150);
       const earlyErrors = await this.setupPageContext(
         filename,
         cwd,
+        pkg,
         pageContext,
       );
       if (earlyErrors) {
@@ -243,7 +263,7 @@ setTimeout(runTests, 150);
     }
 
     const browser = await chromium.launch();
-    const env = await this.getPlatformInfo();
+    const env = await this.getPlatformInfo(pkg);
 
     const suites = new Map<string, TestSuiteResult<T>>();
     for (const filename of filenames) {
@@ -251,6 +271,7 @@ setTimeout(runTests, 150);
       const results = await this.#runTestCase(
         filename,
         cwd,
+        pkg,
         browser,
         pageContext,
       );

@@ -1,6 +1,7 @@
-import { glob, stat } from 'node:fs/promises';
+import { stat } from 'node:fs/promises';
 import { join } from 'node:path';
 import { parseArgs } from 'node:util';
+import { glob } from '#glob';
 
 import { BunTestCaseExecutor } from './bun/executor.ts';
 import { DenoTestCaseExecutor } from './deno/executor.ts';
@@ -21,8 +22,8 @@ import { CompatData, CompatDataDiskSource } from './compat_data.ts';
 async function getTestSuites(
   globs: string[],
   { cwd, platformId }: { cwd: string; platformId: PlatformId },
-) {
-  const suites: string[] = [];
+): Promise<string[]> {
+  const suites = new Set<string>();
   const platformSuffix = `~${platformId}.test.js`;
 
   const matches = await glob(globs, {
@@ -35,17 +36,17 @@ async function getTestSuites(
     const platformMatch = match.replace(/\.test\.js$/, platformSuffix);
     try {
       await stat(join(cwd, platformMatch));
-      suites.push(platformMatch);
+      suites.add(platformMatch);
       continue;
     } catch (e) {
       if ((e as any).code !== 'ENOENT') {
         throw e;
       }
     }
-    suites.push(match);
+    suites.add(match);
   }
 
-  return suites;
+  return [...suites];
 }
 
 const EXECUTORS: {

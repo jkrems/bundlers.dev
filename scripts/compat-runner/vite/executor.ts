@@ -1,5 +1,4 @@
 import { join } from 'node:path';
-import { build, version } from 'vite';
 
 import { type TestResult, type PlatformInfo } from '../executor.ts';
 import {
@@ -8,23 +7,37 @@ import {
 } from '../bundling_executor.ts';
 import { PLATFORMS } from '../compat_data_schema.ts';
 
-export class ViteTestCaseExecutor extends BundlingTestCaseExecutor<'vite'> {
-  protected override async getPlatformInfo(): Promise<PlatformInfo<'vite'>> {
+export class ViteTestCaseExecutor extends BundlingTestCaseExecutor<
+  'vite',
+  typeof import('vite')
+> {
+  protected override async getPlatformInfo(
+    pkg: typeof import('vite'),
+  ): Promise<PlatformInfo<'vite'>> {
     return {
       ...PLATFORMS.vite,
-      version: version,
+      version: pkg.version,
     };
+  }
+
+  protected override getPackageName(): string {
+    return 'vite';
+  }
+
+  protected override loadDefaultPackage(): Promise<typeof import('vite')> {
+    return import('vite');
   }
 
   protected override async setupPageContext(
     filename: string,
     cwd: string,
+    pkg: typeof import('vite'),
     pageContext: PageContext,
   ): Promise<TestResult[] | null> {
     const outDir = join(cwd, '.tmp', pageContext.id);
     let output;
     try {
-      output = await build({
+      output = await pkg.build({
         logLevel: 'silent',
         root: cwd,
         base: `/${pageContext.id}/`,

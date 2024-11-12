@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "update-compat-data": "node --experimental-strip-types ./scripts/compat-runner/main.ts compat-suite/**/*.test.js",
+    "update-compat-data": "node --experimental-strip-types ./scripts/compat-runner/main.ts 'compat-suite/**/*.test.js' '--platform=*'",
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
@@ -23,6 +23,12 @@
     "semver": "^7.6.3",
     "typescript": "^5.6.3",
     "vitest": "^2.1.4"
+  },
+  "imports": {
+    "#glob": {
+      "bun": "./scripts/compat-runner/glob.bun.ts",
+      "default": "./scripts/compat-runner/glob.node.ts"
+    }
   },
   "husky": {
     "hooks": {

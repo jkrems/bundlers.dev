@@ -1,4 +1,3 @@
-import { build, version } from 'esbuild';
 import { join, relative } from 'node:path';
 
 import { type TestResult, type PlatformInfo } from '../executor.ts';
@@ -8,23 +7,37 @@ import {
 } from '../bundling_executor.ts';
 import { PLATFORMS } from '../compat_data_schema.ts';
 
-export class EsbuildTestCaseExecutor extends BundlingTestCaseExecutor<'esbuild'> {
-  protected override async getPlatformInfo(): Promise<PlatformInfo<'esbuild'>> {
+export class EsbuildTestCaseExecutor extends BundlingTestCaseExecutor<
+  'esbuild',
+  typeof import('esbuild')
+> {
+  protected override async getPlatformInfo(
+    pkg: typeof import('esbuild'),
+  ): Promise<PlatformInfo<'esbuild'>> {
     return {
       ...PLATFORMS.esbuild,
-      version,
+      version: pkg.version,
     };
+  }
+
+  protected override getPackageName(): string {
+    return 'esbuild';
+  }
+
+  protected override loadDefaultPackage(): Promise<typeof import('esbuild')> {
+    return import('esbuild');
   }
 
   protected override async setupPageContext(
     filename: string,
     cwd: string,
+    pkg: typeof import('esbuild'),
     pageContext: PageContext,
   ): Promise<TestResult[] | null> {
     let buildResult;
     const outdir = join(cwd, '.tmp', pageContext.id);
     try {
-      buildResult = await build({
+      buildResult = await pkg.build({
         target: 'es2022',
         bundle: true,
         platform: 'browser',

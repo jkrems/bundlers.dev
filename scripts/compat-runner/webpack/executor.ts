@@ -1,9 +1,4 @@
-import {
-  default as webpack,
-  type Configuration,
-  type OutputFileSystem,
-  type Stats,
-} from 'webpack';
+import { type Configuration, type OutputFileSystem, type Stats } from 'webpack';
 import { createFsFromVolume, Volume } from 'memfs';
 import { join } from 'node:path';
 
@@ -14,17 +9,62 @@ import {
 } from '../bundling_executor.ts';
 import { PLATFORMS } from '../compat_data_schema.ts';
 
-export class WebpackTestCaseExecutor extends BundlingTestCaseExecutor<'webpack'> {
-  protected override async getPlatformInfo(): Promise<PlatformInfo<'webpack'>> {
+type PackageType = Pick<typeof import('webpack'), 'webpack' | 'version'>;
+
+function findWebpackFunction(
+  pkg: PackageType,
+): typeof import('webpack').webpack {
+  if (typeof pkg.webpack === 'function') {
+    return pkg.webpack;
+  }
+  if ('default' in pkg && typeof pkg.default === 'function') {
+    return pkg.default as typeof import('webpack').webpack;
+  }
+  throw new Error('Could not find "webpack" export');
+}
+
+function findWebpackVersion(
+  pkg: PackageType,
+): typeof import('webpack').version {
+  if (typeof pkg.version === 'string') {
+    return pkg.version;
+  }
+  if (
+    'default' in pkg &&
+    typeof pkg.default === 'function' &&
+    'version' in pkg.default &&
+    typeof pkg.default.version === 'string'
+  ) {
+    return pkg.default.version;
+  }
+  throw new Error('Could not find "webpack.version" export');
+}
+
+export class WebpackTestCaseExecutor extends BundlingTestCaseExecutor<
+  'webpack',
+  PackageType
+> {
+  protected override async getPlatformInfo(
+    pkg: PackageType,
+  ): Promise<PlatformInfo<'webpack'>> {
     return {
       ...PLATFORMS.webpack,
-      version: webpack.version,
+      version: findWebpackVersion(pkg),
     };
+  }
+
+  protected override getPackageName(): string {
+    return 'webpack';
+  }
+
+  protected override loadDefaultPackage(): Promise<PackageType> {
+    return import('webpack');
   }
 
   protected override async setupPageContext(
     filename: string,
     cwd: string,
+    pkg: PackageType,
     pageContext: PageContext,
   ): Promise<TestResult[] | null> {
     let stats: Stats;
@@ -42,7 +82,7 @@ export class WebpackTestCaseExecutor extends BundlingTestCaseExecutor<'webpack'>
           publicPath: `/${pageContext.id}/`,
         },
       };
-      const compiler = webpack(options);
+      const compiler = findWebpackFunction(pkg)(options);
       compiler.outputFileSystem = fs as OutputFileSystem;
 
       stats = await new Promise((resolve, reject) => {
