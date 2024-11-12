@@ -1,6 +1,7 @@
 import { type Configuration, type OutputFileSystem, type Stats } from 'webpack';
 import { createFsFromVolume, Volume } from 'memfs';
 import { join } from 'node:path';
+import { createRequire } from 'node:module';
 
 import { type TestResult, type PlatformInfo } from '../executor.ts';
 import {
@@ -10,6 +11,20 @@ import {
 import { PLATFORMS } from '../compat_data_schema.ts';
 
 type PackageType = Pick<typeof import('webpack'), 'webpack' | 'version'>;
+
+/** Early versions of webpack have a hard-coded reference to md4. */
+function patchCrypto() {
+  const require = createRequire(new URL(import.meta.url));
+  const crypto = require('node:crypto');
+  const originalCreateHash = crypto.createHash;
+  crypto.createHash = function createHash(algorithm: string) {
+    if (algorithm === 'md4') {
+      algorithm = 'md5';
+    }
+    return originalCreateHash(algorithm);
+  };
+}
+patchCrypto();
 
 function findWebpackFunction(
   pkg: PackageType,
@@ -80,6 +95,8 @@ export class WebpackTestCaseExecutor extends BundlingTestCaseExecutor<
         output: {
           path: outdir,
           publicPath: `/${pageContext.id}/`,
+          // We don't care about speed but we need to hash for older versions.
+          hashFunction: 'md5',
         },
       };
       const compiler = findWebpackFunction(pkg)(options);
@@ -107,6 +124,7 @@ export class WebpackTestCaseExecutor extends BundlingTestCaseExecutor<
         description: err.message,
         error: {
           message: err.message,
+          stack: err.stack,
         },
       }));
     }

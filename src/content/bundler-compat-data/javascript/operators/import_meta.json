@@ -120,7 +120,7 @@
                 ]
               },
               "vite": {
-                "version_added": "5.4.10",
+                "version_added": "5.0.0",
                 "notes": [
                   "Cannot <code>fetch()</code> the result of <code>import.meta.resolve</code>"
                 ]
@@ -198,8 +198,8 @@
               "support": {
                 "esbuild": { "version_added": "0.24.0" },
                 "rsbuild": { "version_added": "1.1.0" },
-                "vite": { "version_added": "5.4.10" },
-                "webpack": { "version_added": "5.96.1" },
+                "vite": { "version_added": "5.0.0" },
+                "webpack": { "version_added": "5.0.0" },
                 "bun": { "version_added": "1.1.0" },
                 "deno": { "version_added": "1.46.0" },
                 "nodejs": { "version_added": "18.19.0" },
@@ -244,7 +244,7 @@
                   "version_added": "5.0.0",
                   "version_removed": "5.70.0",
                   "notes": [
-                    "<code>webpackContext</code> was not available in the initial release."
+                    "Fails: <code>import&#8288;.meta.webpackContext</code> is available"
                   ],
                   "partial_implementation": true
                 }

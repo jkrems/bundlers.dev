@@ -17,6 +17,7 @@ import {
   type ExecutorOptions,
 } from './executor.ts';
 import type { PlatformId } from './compat_data_schema.ts';
+import { getPackageAtVersion } from './package-cache/index.ts';
 
 export interface PageContext {
   id: string;
@@ -224,7 +225,8 @@ setTimeout(runTests, 150);
 
   private async getPackage(overrideVersion: string | null): Promise<PackageT> {
     if (overrideVersion) {
-      throw new Error(`Overriding the version is not implemented yet`);
+      const packageName = this.getPackageName(overrideVersion);
+      return getPackageAtVersion(packageName, overrideVersion) as PackageT;
     } else {
       return this.loadDefaultPackage();
     }
@@ -234,9 +236,6 @@ setTimeout(runTests, 150);
     filenames: string[],
     { cwd, isDebug, overrideVersion }: ExecutorOptions,
   ): Promise<Map<string, TestSuiteResult<T>>> {
-    if (overrideVersion) {
-      throw new Error(`Overriding the version is not implemented yet`);
-    }
     const pkg: PackageT = await this.getPackage(overrideVersion);
 
     if (isDebug) {
